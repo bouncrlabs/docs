@@ -36,7 +36,8 @@
       {
         "group": "Getting started",
         "pages": [
-          "external/overview"
+          "external/overview",
+          "external/web"
         ]
       },
       {
