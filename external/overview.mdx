@@ -7,21 +7,37 @@ Let customers scan an ID or passport without leaving your application. Bouncr gu
 
 The Web SDK provides camera controls and capture events. You build the screens with your own components, styles, and copy.
 
-## Get started
-
-Follow the [Web quickstart](./web) to add a capture page and complete your first scan. You’ll connect your backend, open the camera, and retrieve the result.
+<Card title="Build your first capture screen" icon="react" href="/external/web">
+  Follow the React quickstart to select a document, capture it, and retrieve your first result.
+</Card>
 
 ## Build your integration
 
-| I want to… | Guide |
-| --- | --- |
-| Start my first scan | [Web quickstart](./web) |
-| Authorize capture from my application | [Connect your backend](./backend) |
-| Style the viewfinder and instructions | [Customize capture](./customize) |
-| Read the verification result | [Handle results](./results) |
-| Resume after a refresh | [Resume a scan](./resume) |
-| Choose which documents to accept | [Supported documents](./documents) |
-| Help a customer finish a scan | [Troubleshooting](./recovery) |
+<CardGroup cols={2}>
+  <Card title="Connect your backend" icon="server" href="/external/backend">
+    Authorize capture for your signed-in customers.
+  </Card>
+
+  <Card title="Customize capture" icon="palette" href="/external/customize">
+    Use your own components, instructions, and camera controls.
+  </Card>
+
+  <Card title="Handle results" icon="check" href="/external/results">
+    Read the verification decision and document details.
+  </Card>
+
+  <Card title="Resume a scan" icon="rotate-right" href="/external/resume">
+    Restore accepted captures after a refresh.
+  </Card>
+
+  <Card title="Supported documents" icon="passport" href="/external/documents">
+    Choose the documents your integration accepts.
+  </Card>
+
+  <Card title="Troubleshooting" icon="life-ring" href="/external/recovery">
+    Help customers finish their capture.
+  </Card>
+</CardGroup>
 
 ## A capture from start to finish
 
@@ -29,4 +45,4 @@ Your customer chooses the issuing country and document, then opens the camera. B
 
 Each scan has an ID. Save it alongside the customer’s application or onboarding record so you can retrieve the result later.
 
-For method signatures, options, and callbacks, see the [Web SDK reference](./reference).
+For method signatures, options, and callbacks, see the [Web SDK reference](/external/reference).

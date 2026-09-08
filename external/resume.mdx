@@ -26,7 +26,7 @@ const scanId = sessionStorage.getItem('bouncrScanId');
 capture.start(scanId ?? undefined);
 ```
 
-Your authorization endpoint checks the customer’s access and returns fresh initialization data for the existing scan. The [backend example](./backend) recovers the scan from the signed-in session.
+Your authorization endpoint checks the customer’s access and returns fresh initialization data for the existing scan. The [backend example](/external/backend) recovers the scan from the signed-in session.
 
 The SDK restores the accepted images and requests the remaining side. If capture is already complete, it proceeds to processing status. A refresh before the first accepted capture requires the customer to capture again.
 
@@ -45,4 +45,4 @@ onComplete(scanId) {
 }
 ```
 
-Keep the scan ID on your backend record so you can [retrieve its result](./results) later.
+Keep the scan ID on your backend record so you can [retrieve its result](/external/results) later.

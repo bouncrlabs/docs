@@ -21,7 +21,7 @@ All IDs are strings. JSON requests use `Content-Type: application/json`.
 | `scans:results:read` | Read verification results |
 | `scans:list` | List accessible scans |
 
-Scopes apply within the venues granted to your integration. For credential setup, see [Connect your backend](./backend).
+Scopes apply within the venues granted to your integration. For credential setup, see [Connect your backend](/external/backend).
 
 ## Create a scan
 
@@ -64,7 +64,7 @@ Response: `200 OK`.
 
 `expires_in` is the returned token lifetime in seconds. Use the actual response value; it may be shorter than the example.
 
-Return this response and the configuration string to the SDK using your [authorization handler](./backend#add-the-authorization-endpoint).
+Return this response and the configuration string to the SDK using your [authorization handler](/external/backend#add-the-authorization-endpoint).
 
 ### Document-type values
 
@@ -79,7 +79,7 @@ Return this response and the configuration string to the SDK using your [authori
 | 11 | `DocumentType.VISA` | Visa |
 | 12 | `DocumentType.OTHER_TRAVEL_DOCUMENT` | Other travel document |
 
-Use values returned by the SDK’s document selection state. Availability is described in [Supported documents](./documents).
+Use values returned by the SDK’s document selection state. Availability is described in [Supported documents](/external/documents).
 
 ## Read scan progress
 
@@ -100,7 +100,7 @@ Response: `200 OK` with the current scan state. The progress fields are:
 
 `GET /v1/scans/{scan_id}/result` · Scope: `scans:results:read`
 
-Response: `200 OK`. See [Handle results](./results) for the response fields and completion handling. `402 Payment Required` indicates that result access requires a purchase.
+Response: `200 OK`. See [Handle results](/external/results) for the response fields and completion handling. `402 Payment Required` indicates that result access requires a purchase.
 
 ## List scans
 
@@ -137,4 +137,4 @@ Use the last record’s ID as `before` to request the next page.
 | `429` | Request rate limited | Retry with backoff |
 | `5xx` | Temporary service error | Retry with backoff, preserving the scan ID |
 
-Check HTTP status before decoding a body; some failures have an empty body. For errors during camera capture, use the SDK’s `ErrorCode` and the [troubleshooting guide](./recovery).
+Check HTTP status before decoding a body; some failures have an empty body. For errors during camera capture, use the SDK’s `ErrorCode` and the [troubleshooting guide](/external/recovery).

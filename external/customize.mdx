@@ -3,7 +3,7 @@ title: "Customize capture"
 description: "Build your capture screens with your own components, copy, and camera controls."
 ---
 
-Start with the [quickstart](./web), then replace its HTML and styles with your application’s components. The SDK attaches the camera to your video element and reports state changes through `onState`.
+Start with the [quickstart](/external/web), then replace its HTML and styles with your application’s components. The SDK attaches the camera to your video element and reports state changes through `onState`.
 
 ## Choose documents before opening the camera
 
@@ -19,7 +19,7 @@ Build your document selector from `state.allowedDocumentTypes`, filtered by `sup
 capture.start(state.scanId, selectedDocumentType, selectedCountry);
 ```
 
-Use ISO two-letter country codes, such as `US` or `GB`. Display the country’s localized name in your interface. See [Supported documents](./documents) for document labels and capture instructions.
+Use ISO two-letter country codes, such as `US` or `GB`. Display the country’s localized name in your interface. See [Supported documents](/external/documents) for document labels and capture instructions.
 
 ## Style the camera view
 
@@ -81,7 +81,7 @@ onTorchChange({ available, enabled }) {
 
 ## Localize instructions
 
-Map `Guidance` and `ErrorCode` values to your message catalog. Use the SDK values to choose an action and your translated copy to explain it. The [troubleshooting guide](./recovery) provides suggested messages and recovery actions.
+Map `Guidance` and `ErrorCode` values to your message catalog. Use the SDK values to choose an action and your translated copy to explain it. The [troubleshooting guide](/external/recovery) provides suggested messages and recovery actions.
 
 ## Clean up on navigation
 
