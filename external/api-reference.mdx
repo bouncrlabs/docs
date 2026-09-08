@@ -1,0 +1,140 @@
+---
+title: "HTTP API reference"
+description: "Create scans, authorize capture, and retrieve results."
+---
+
+Use the API base URL provided for your integration. Keep API access tokens on your backend and send them in the Authorization header:
+
+```http
+Authorization: Bearer YOUR_API_ACCESS_TOKEN
+```
+
+All IDs are strings. JSON requests use `Content-Type: application/json`.
+
+## Permissions
+
+| Scope | Access |
+| --- | --- |
+| `scans:create` | Create scans |
+| `scans:capture` | Authorize document capture |
+| `scans:read` | Read scan progress |
+| `scans:results:read` | Read verification results |
+| `scans:list` | List accessible scans |
+
+Scopes apply within the venues granted to your integration. For credential setup, see [Connect your backend](./backend).
+
+## Create a scan
+
+`POST /v1/scans` · Scope: `scans:create`
+
+| Body field | Required | Description |
+| --- | --- | --- |
+| `venue_id` | Yes | Venue receiving the scan |
+
+```json
+{ "venue_id": "128000000000000000" }
+```
+
+Response: `201 Created`.
+
+```json
+{ "id": "128000000000000001" }
+```
+
+## Authorize capture
+
+`POST /v1/scans/{scan_id}/capture-authorizations` · Scope: `scans:capture`
+
+| Body field | Required | Description |
+| --- | --- | --- |
+| `origin` | Yes | Registered capture-page origin |
+| `capture_key_thumbprint` | Yes | `thumbprint` received from the SDK callback |
+| `country` | No | Selected issuing country; ISO two-letter code |
+| `document_type` | No | Selected document-type enum value |
+
+Response: `200 OK`.
+
+```json
+{
+  "access_token": "CAPTURE_ACCESS_TOKEN",
+  "token_type": "Bearer",
+  "expires_in": 3600
+}
+```
+
+`expires_in` is the returned token lifetime in seconds. Use the actual response value; it may be shorter than the example.
+
+Return this response and the configuration string to the SDK using your [authorization handler](./backend#add-the-authorization-endpoint).
+
+### Document-type values
+
+| Value | SDK constant | Document |
+| --- | --- | --- |
+| 2 | `DocumentType.DRIVERS_LICENSE` | Driver’s license |
+| 3 | `DocumentType.ENHANCED_DRIVERS_LICENSE` | Enhanced driver’s license |
+| 4 | `DocumentType.STATE_ID` | State or provincial ID |
+| 5 | `DocumentType.PASSPORT_BOOK` | Passport |
+| 6 | `DocumentType.PASSPORT_CARD` | Passport card |
+| 7 | `DocumentType.PERMANENT_RESIDENT_CARD` | Permanent resident card |
+| 11 | `DocumentType.VISA` | Visa |
+| 12 | `DocumentType.OTHER_TRAVEL_DOCUMENT` | Other travel document |
+
+Use values returned by the SDK’s document selection state. Availability is described in [Supported documents](./documents).
+
+## Read scan progress
+
+`GET /v1/scans/{scan_id}` · Scope: `scans:read`
+
+Response: `200 OK` with the current scan state. The progress fields are:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `scan_id` | `string` | Scan ID |
+| `seed_accepted` | `boolean` | Initial document capture accepted |
+| `capture_complete` | `boolean` | All required images accepted |
+| `complete` | `boolean` | Processing finished |
+| `required_sides` | `number[]` | Requested sides: `1` rear, `2` front |
+| `accepted_sides` | `number[]` | Accepted sides |
+
+## Retrieve a result
+
+`GET /v1/scans/{scan_id}/result` · Scope: `scans:results:read`
+
+Response: `200 OK`. See [Handle results](./results) for the response fields and completion handling. `402 Payment Required` indicates that result access requires a purchase.
+
+## List scans
+
+`GET /v1/scans` · Scope: `scans:list`
+
+| Query parameter | Required | Description |
+| --- | --- | --- |
+| `before` | No | Return scans older than this ID |
+
+Returns up to 50 records in descending ID order:
+
+```json
+[
+  {
+    "id": "128000000000000001",
+    "venue_id": "128000000000000000",
+    "created_at": "2026-09-08T12:00:00Z"
+  }
+]
+```
+
+Use the last record’s ID as `before` to request the next page.
+
+## Error responses
+
+| Status | Meaning | Action |
+| --- | --- | --- |
+| `401` | Missing, expired, or invalid credential | Obtain valid authorization |
+| `402` | Result purchase required | Resolve account access before retrieving the result |
+| `403` | Operation not permitted | Check the credential’s scopes and venue access |
+| `404` | Resource unavailable to this credential | Check the stored scan ID and its ownership |
+| `409` | Conflicting capture | Resume through the SDK or continue in the active window |
+| `422` | Invalid request or document evidence | Correct the request or follow SDK recovery guidance |
+| `429` | Request rate limited | Retry with backoff |
+| `5xx` | Temporary service error | Retry with backoff, preserving the scan ID |
+
+Check HTTP status before decoding a body; some failures have an empty body. For errors during camera capture, use the SDK’s `ErrorCode` and the [troubleshooting guide](./recovery).

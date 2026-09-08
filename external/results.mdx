@@ -1,0 +1,106 @@
+---
+title: "Handle results"
+description: "Respond to capture completion and retrieve the verification result from your backend."
+---
+
+After your customer captures their document, Bouncr processes the scan. Use SDK callbacks to update the page and the result API to drive your application’s decision.
+
+## Show upload and processing progress
+
+Render `Phase.SUBMITTING` as an upload state and `Phase.PROCESSING` as a processing state. Keep the customer on the same scan while work completes.
+
+Two callbacks let you choose when to update your flow:
+
+| Callback | When it runs | Common use |
+| --- | --- | --- |
+| `onCaptureComplete(scanId)` | All required captures have been accepted | Close the capture screen and show processing elsewhere |
+| `onComplete(scanId)` | The scan’s processing finishes | Ask your backend for the next step |
+
+For example, replace the quickstart’s completion handler with:
+
+```javascript
+onComplete(scanId) {
+  window.location.assign('/onboarding/review');
+}
+```
+
+Have your review route look up the scan associated with the signed-in customer and retrieve its result. The completion callback signals finished processing; the API response supplies the verification decision.
+
+## Retrieve a result
+
+Call this endpoint from your backend with `scans:results:read`:
+
+```bash
+curl "$BOUNCR_API_URL/v1/scans/$SCAN_ID/result" \
+  -H "Authorization: Bearer $BOUNCR_API_TOKEN"
+```
+
+| Response field | Use it to… |
+| --- | --- |
+| `scan_id` | Match the result to your application record |
+| `complete` | Check whether processing has finished |
+| `verification` | Read the decision, integrity, age, and expiration checks |
+| `document` | Read authorized document details, such as the person’s name and date of birth |
+| `dmv` | Read the DMV check status and available details |
+
+If processing is still running, keep the customer in your processing state and check again with a bounded polling interval. A `402` response means result access requires a purchase; handle it through your account/billing workflow.
+
+Detailed result fields depend on the checks enabled for your integration. Treat an absent check as unavailable. Fetching the scan later returns its latest authorized result.
+
+Example response, showing selected fields:
+
+```json
+{
+  "scan_id": "128000000000000001",
+  "complete": true,
+  "verification": {
+    "decision": "DECISION_ACCEPT",
+    "integrity": "INTEGRITY_REAL",
+    "of_age": true,
+    "not_expired": true
+  },
+  "document": {
+    "given_name": "Alex",
+    "surname": "Morgan",
+    "date_of_birth": "1995-06-15",
+    "issuing_country": "US"
+  }
+}
+```
+
+### Interpret the decision
+
+| `verification.decision` | Meaning |
+| --- | --- |
+| `DECISION_ACCEPT` | Accepted by the configured checks |
+| `DECISION_REJECT` | Rejected by the configured checks |
+| `DECISION_VERIFY` | Requires further verification or review |
+| `DECISION_ACCEPT_BY_AUTHORIZED_ACTOR` | Accepted through an authorized override |
+| `DECISION_REJECT_BY_AUTHORIZED_ACTOR` | Rejected through an authorized override |
+| `DECISION_UNSPECIFIED` | No decision available |
+
+Your application determines how to handle review and authorized overrides. Evaluate `complete` before taking a final action.
+
+### Interpret individual checks
+
+`verification.integrity` is one of `INTEGRITY_REAL`, `INTEGRITY_VERIFIED_REAL`, `INTEGRITY_POSSIBLY_FAKE`, `INTEGRITY_FAKE`, `INTEGRITY_VERIFIED_FAKE`, or `INTEGRITY_UNSPECIFIED`. Use it alongside the overall decision.
+
+`of_age: true` and `not_expired: true` indicate positive checks. In this response, `false` can also represent a check with no positive result available; it does not distinguish an unavailable check from a failed check. When `verification` is absent or the decision is unspecified, keep the scan in your pending/review flow.
+
+## List previous scans
+
+Use `scans:list` to retrieve scans available to your integration:
+
+```bash
+curl "$BOUNCR_API_URL/v1/scans" \
+  -H "Authorization: Bearer $BOUNCR_API_TOKEN"
+```
+
+The response is an array of records containing `id`, `venue_id`, and `created_at`. To load the next page, pass the final record’s ID as `before`:
+
+```bash
+curl "$BOUNCR_API_URL/v1/scans?before=$LAST_SCAN_ID" \
+  -H "Authorization: Bearer $BOUNCR_API_TOKEN"
+```
+
+Use your backend to combine this list with individual scan results for an activity view or review screen.
