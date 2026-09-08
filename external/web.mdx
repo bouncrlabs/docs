@@ -1,196 +1,262 @@
 ---
-title: "Web quickstart"
-description: "Add a capture page, scan a document, and retrieve your first result."
+title: "React quickstart"
+description: "Build a React capture screen and complete your first document scan."
+icon: "react"
 ---
 
-This guide creates a small capture page with country and document selection, automatic capture, and a completion message. It uses plain JavaScript; you can move the same integration into your application’s components afterward.
+Add country and document selection, a live camera preview, automatic capture, and a completion screen to your React application. This example uses TypeScript and Vite.
 
-## Before you begin
+<Info>
+  You’ll need the SDK archive supplied by Bouncr, an API credential, a venue ID, and a registered capture-page origin. Serve your app over HTTPS, or use localhost during development.
+</Info>
 
-You’ll need the SDK package supplied by Bouncr, an API credential, a venue ID, and your registered capture-page origin. A venue groups your scans and capture settings.
+<Steps>
+  <Step title="Connect your backend">
+    Follow [Connect your backend](/external/backend) to add `/capture/authorize` using your existing signed-in session. Keep this route on the same origin as your React app, or proxy it there in development.
 
-Complete [Connect your backend](/external/backend) to add `/capture/authorize` to your application. The example below calls that route using your existing signed-in session.
+    The browser receives authorization for one scan. Your backend keeps the API credential and retrieves verification results.
+  </Step>
+  <Step title="Install the SDK">
+    In your React app, install the supplied archive. Replace the filename with the one you received.
 
-Serve the page over HTTPS, or use `localhost` during development so the browser can access the camera.
+    <CodeGroup>
 
-## 1. Install the SDK
+    ```bash npm
+    npm install ./bouncr-capture.tgz
+    ```
 
-Place the supplied package archive in your project and install it. Replace the filename below with your archive’s filename.
+    ```bash bun
+    bun add ./bouncr-capture.tgz
+    ```
 
-```bash
-npm install ./bouncr-capture.tgz
-```
+    ```bash pnpm
+    pnpm add ./bouncr-capture.tgz
+    ```
 
-Copy the SDK’s browser assets into your application’s public directory:
+    </CodeGroup>
 
-```bash
-node --input-type=module -e "import { cpSync } from 'node:fs'; cpSync('node_modules/@bouncr/capture/dist', 'public/bouncr', { recursive: true });"
-```
+    Copy the browser assets into your public directory:
 
-Your application should now serve `/bouncr/index.js`. Keep the files in this directory together when deploying or upgrading the SDK.
+    ```bash
+    node --input-type=module -e "import { cpSync } from 'node:fs'; cpSync('node_modules/@bouncr/capture/dist', 'public/bouncr', { recursive: true });"
+    ```
 
-## 2. Add the capture page
+    Your app should serve `/bouncr/index.js` and the accompanying assets. Copy this directory again whenever you upgrade the SDK.
+  </Step>
+  <Step title="Add the capture component">
+    Create these files in `src/`. The component keeps the camera closed until the customer selects a country and document and presses **Open camera**.
 
-Create `public/capture/index.html`:
+    <CodeGroup>
 
-```html
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Capture your document</title>
-  <style>
-    body { font: 16px/1.5 system-ui; max-width: 480px; margin: 32px auto; padding: 0 20px; }
-    select, button { font: inherit; padding: 12px; margin: 8px 0; width: 100%; }
-    video { width: 100%; border-radius: 12px; }
-    [hidden] { display: none !important; }
-  </style>
-</head>
-<body>
-  <h1>Capture your document</h1>
-  <p id="message" role="status">Loading…</p>
-  <section id="selection" hidden>
-    <label for="country">Issuing country</label>
-    <select id="country"></select>
-    <label for="document">Document</label>
-    <select id="document"></select>
-    <button id="start" disabled>Open camera</button>
-  </section>
-  <video id="camera" autoplay playsinline muted hidden></video>
-  <button id="cancel" hidden>Cancel capture</button>
-  <script type="module" src="./capture.js"></script>
-</body>
-</html>
-```
-
-The camera stays hidden while the customer selects a document. Instructions appear above the camera view.
-
-## 3. Initialize capture
-
-Create `public/capture/capture.js` beside the HTML file:
-
-```javascript
-import { createCapture, Phase, Guidance, Side, DocumentType, supportedDocumentTypes } from '/bouncr/index.js';
-
-const video = document.querySelector('#camera');
-const message = document.querySelector('#message');
-const selection = document.querySelector('#selection');
-const country = document.querySelector('#country');
-const documentType = document.querySelector('#document');
-const start = document.querySelector('#start');
-const cancel = document.querySelector('#cancel');
-const countryNames = new Intl.DisplayNames(['en'], { type: 'region' });
-const labels = new Map([
-  [DocumentType.DRIVERS_LICENSE, "Driver’s license"],
-  [DocumentType.ENHANCED_DRIVERS_LICENSE, "Driver’s license"],
-  [DocumentType.STATE_ID, 'State or provincial ID'],
-  [DocumentType.PASSPORT_BOOK, 'Passport'],
-  [DocumentType.PASSPORT_CARD, 'Passport card'],
-  [DocumentType.PERMANENT_RESIDENT_CARD, 'Permanent resident card'],
-  [DocumentType.VISA, 'Visa'],
-  [DocumentType.OTHER_TRAVEL_DOCUMENT, 'Other travel document'],
-]);
-const instructions = new Map([
-  [Guidance.ALIGN_DOCUMENT, 'Place your document inside the camera view.'],
-  [Guidance.MOVE_CLOSER, 'Move closer while keeping the document in focus.'],
-  [Guidance.IMPROVE_FOCUS, 'Hold your document steady.'],
-  [Guidance.REDUCE_GLARE, 'Tilt your document slightly to reduce glare.'],
-  [Guidance.HOLD_STILL, 'Hold still. Capturing automatically…'],
-  [Guidance.FLIP_DOCUMENT, 'Turn your document over.'],
-  [Guidance.CLEAR_BACKGROUND, 'Place your document on a plain background.'],
-]);
-let state;
-
-try {
-  const capture = await createCapture({
-    video,
-    authorize: async ({ signal, ...request }) => {
-      const response = await fetch('/capture/authorize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(request),
-        signal,
-      });
-      if (!response.ok) throw new Error('Unable to start capture');
-      return response.json();
-    },
-    onState(next) {
-      state = next;
-      selection.hidden = next.phase !== Phase.SELECTING_DOCUMENT;
-      video.hidden = next.phase !== Phase.CAPTURING;
-      cancel.hidden = ![Phase.CAPTURING, Phase.SUBMITTING].includes(next.phase);
-      if (next.phase === Phase.SELECTING_DOCUMENT) {
-        country.replaceChildren(new Option('Choose a country', ''), ...next.countryCodes.map(code => new Option(countryNames.of(code), code)));
-        country.value = next.country;
-        const types = next.allowedDocumentTypes.filter(type => supportedDocumentTypes.includes(type));
-        const choices = types.filter(type => type !== DocumentType.ENHANCED_DRIVERS_LICENSE || !types.includes(DocumentType.DRIVERS_LICENSE));
-        documentType.replaceChildren(new Option('Choose a document', ''), ...choices.map(type => new Option(labels.get(type), String(type))));
-        documentType.disabled = !next.country;
-        start.disabled = true;
-        message.textContent = 'Choose your document, then open the camera.';
-      } else if (next.phase === Phase.CAPTURING) {
-        const side = next.requiredSides.find(side => !next.acceptedSides.includes(side));
-        const prompt = next.documentType === DocumentType.PASSPORT_BOOK ? 'Show the passport photo page.'
-          : [DocumentType.PASSPORT_CARD, DocumentType.PERMANENT_RESIDENT_CARD, DocumentType.VISA, DocumentType.OTHER_TRAVEL_DOCUMENT].includes(next.documentType) ? 'Show the page or side with the machine-readable text.'
-          : side === Side.REAR ? 'Show the back of your ID.' : 'Show the front of your ID.';
-        message.textContent = `${prompt} ${instructions.get(next.guidance) ?? ''}`;
-      } else if (next.phase === Phase.SUBMITTING) {
-        message.textContent = 'Uploading your document…';
-      } else if (next.phase === Phase.PROCESSING) {
-        message.textContent = 'Finishing up…';
-      } else if (next.phase === Phase.FAILED) {
-        message.textContent = 'Capture could not finish. Please try again.';
-      } else if (next.phase === Phase.SUPERSEDED) {
-        message.textContent = 'Continue in the other capture window.';
-      } else if (next.phase === Phase.STOPPED) {
-        message.textContent = 'Capture canceled. Reload this page to start again.';
+    ```tsx Capture.tsx
+    import { useEffect, useRef, useState } from 'react';
+    import type { CaptureState } from '@bouncr/capture';
+    import './capture.css';
+    
+    type SDK = typeof import('@bouncr/capture');
+    type CaptureInstance = Awaited<ReturnType<SDK['createCapture']>>;
+    
+    export default function Capture() {
+      const video = useRef<HTMLVideoElement>(null);
+      const capture = useRef<CaptureInstance | null>(null);
+      const [sdk, setSdk] = useState<SDK>();
+      const [state, setState] = useState<CaptureState>();
+      const [documentType, setDocumentType] = useState('');
+      const [completedId, setCompletedId] = useState('');
+      const [loadError, setLoadError] = useState('');
+      const [pending, setPending] = useState(true);
+    
+      useEffect(() => {
+        let disposed = false;
+        let instance: CaptureInstance | undefined;
+    
+        async function initialize() {
+          // Keep the SDK module beside its worker and WASM assets.
+          const url = '/bouncr/index.js';
+          const module: SDK = await import(/* @vite-ignore */ url);
+          if (disposed || !video.current) return;
+          instance = await module.createCapture({
+            video: video.current,
+            authorize: async ({ signal, ...request }) => {
+              const response = await fetch('/capture/authorize', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(request),
+                signal,
+              });
+              if (!response.ok) throw new Error('Unable to authorize capture');
+              return response.json();
+            },
+            onState(next) {
+              if (disposed) return;
+              setState(next);
+              setPending(false);
+            },
+            onComplete(scanId) {
+              if (!disposed) setCompletedId(scanId);
+            },
+          });
+          if (disposed) return instance.destroy();
+          capture.current = instance;
+          setSdk(module);
+          instance.start();
+        }
+    
+        initialize().catch(() => {
+          if (!disposed) setLoadError('The scanner could not load. Refresh to try again.');
+        });
+        return () => {
+          disposed = true;
+          instance?.destroy();
+          capture.current = null;
+        };
+      }, []);
+    
+      const selecting = !!sdk && state?.phase === sdk.Phase.SELECTING_DOCUMENT;
+      const capturing = !!sdk && state?.phase === sdk.Phase.CAPTURING;
+      const choices = sdk && state ? state.allowedDocumentTypes
+        .filter(type => sdk.supportedDocumentTypes.includes(type))
+        .filter(type => type !== sdk.DocumentType.ENHANCED_DRIVERS_LICENSE
+          || !state.allowedDocumentTypes.includes(sdk.DocumentType.DRIVERS_LICENSE)) : [];
+      const countryNames = new Intl.DisplayNames(['en'], { type: 'region' });
+    
+      return (
+        <main className="capture-page">
+          <h1>Capture your document</h1>
+          <p role="status" aria-live="polite">
+            {loadError || (completedId ? 'You’re all set.' : sdk && state ? instruction(sdk, state) : 'Loading scanner…')}
+          </p>
+          {selecting && (
+            <section aria-label="Document selection">
+              <label htmlFor="country">Issuing country</label>
+              <select id="country" value={state?.country ?? ''} disabled={pending} onChange={event => {
+                setDocumentType('');
+                if (!event.target.value) return;
+                setPending(true);
+                capture.current?.start(state?.scanId, undefined, event.target.value);
+              }}>
+                <option value="" disabled>Choose a country</option>
+                {state?.countryCodes.map(code => <option key={code} value={code}>{countryNames.of(code)}</option>)}
+              </select>
+              <label htmlFor="document">Document</label>
+              <select id="document" value={documentType} disabled={pending || !state?.country} onChange={event => setDocumentType(event.target.value)}>
+                <option value="">Choose a document</option>
+                {choices.map(type => <option key={type} value={type}>{documentLabel(sdk!, type)}</option>)}
+              </select>
+              <button disabled={pending || !state?.country || !documentType} onClick={() => {
+                setPending(true);
+                capture.current?.start(state?.scanId, Number(documentType), state?.country);
+              }}>Open camera</button>
+            </section>
+          )}
+          <video ref={video} autoPlay playsInline muted hidden={!capturing} />
+          {capturing && <button onClick={() => capture.current?.stop()}>Cancel capture</button>}
+          {completedId && <p>Scan reference: <output>{completedId}</output></p>}
+        </main>
+      );
+    }
+    
+    function documentLabel(sdk: SDK, type: number) {
+      const D = sdk.DocumentType;
+      return new Map([
+        [D.DRIVERS_LICENSE, 'Driver’s license'], [D.ENHANCED_DRIVERS_LICENSE, 'Driver’s license'],
+        [D.STATE_ID, 'State or provincial ID'], [D.PASSPORT_BOOK, 'Passport'],
+        [D.PASSPORT_CARD, 'Passport card'], [D.PERMANENT_RESIDENT_CARD, 'Permanent resident card'],
+        [D.VISA, 'Visa'], [D.OTHER_TRAVEL_DOCUMENT, 'Other travel document'],
+      ]).get(type) ?? 'Document';
+    }
+    
+    function instruction(sdk: SDK, state: CaptureState) {
+      const { Phase: P, Guidance: G, DocumentType: D, ErrorCode: E } = sdk;
+      if (state.phase === P.SELECTING_DOCUMENT) return 'Choose your document, then open the camera.';
+      if (state.phase === P.SUBMITTING) return 'Uploading your document…';
+      if (state.phase === P.PROCESSING) return 'Finishing up…';
+      if (state.phase === P.SUPERSEDED) return 'Continue in the other capture window.';
+      if (state.phase === P.STOPPED) return 'Capture canceled. Reload this page to start again.';
+      if (state.phase === P.FAILED) {
+        if (state.error?.code === E.COUNTRY_MISMATCH) return 'Choose the country that issued this document.';
+        if (state.error?.code === E.DOCUMENT_TYPE_MISMATCH) return 'Choose the type of document you are scanning.';
+        return 'Capture could not finish. Please try again.';
       }
-    },
-    onComplete(scanId) {
-      message.textContent = "You’re all set. You can close this page.";
-      console.info('Completed scan:', scanId);
-    },
-  });
-  country.onchange = () => {
-    start.disabled = true;
-    if (country.value) capture.start(state.scanId, undefined, country.value);
-  };
-  documentType.onchange = () => { start.disabled = !country.value || !documentType.value; };
-  start.onclick = () => {
-    start.disabled = true;
-    capture.start(state.scanId, Number(documentType.value), country.value);
-  };
-  cancel.onclick = () => capture.stop();
-  window.addEventListener('pagehide', () => capture.destroy(), { once: true });
-  capture.start();
-} catch {
-  message.textContent = 'The scanner could not load. Refresh the page to try again.';
-}
-```
+      if (state.phase !== P.CAPTURING) return 'Preparing capture…';
+      const side = state.requiredSides.find(side => !state.acceptedSides.includes(side));
+      const prompt = state.documentType === D.PASSPORT_BOOK ? 'Show the passport photo page.'
+        : [D.PASSPORT_CARD, D.PERMANENT_RESIDENT_CARD, D.VISA, D.OTHER_TRAVEL_DOCUMENT].includes(state.documentType) ? 'Show the page or side with the machine-readable text.'
+        : side === sdk.Side.REAR ? 'Show the back of your ID.' : 'Show the front of your ID.';
+      const guidance = new Map([
+        [G.ALIGN_DOCUMENT, 'Place your document inside the camera view.'],
+        [G.MOVE_CLOSER, 'Move closer while keeping the document in focus.'],
+        [G.IMPROVE_FOCUS, 'Hold your document steady.'],
+        [G.REDUCE_GLARE, 'Tilt your document slightly to reduce glare.'],
+        [G.HOLD_STILL, 'Hold still. Capturing automatically…'],
+        [G.FLIP_DOCUMENT, 'Turn your document over.'],
+        [G.CLEAR_BACKGROUND, 'Place your document on a plain background.'],
+      ]).get(state.guidance) ?? '';
+      return `${prompt} ${guidance}`;
+    }
+    ```
 
-`authorize` connects the SDK to your backend. `onState` updates the page as the customer makes a selection and captures their document. `onComplete` runs when processing finishes.
+    ```css capture.css
+    .capture-page { max-width: 480px; margin: 32px auto; padding: 0 20px; font: 16px/1.5 system-ui; }
+    .capture-page select, .capture-page button { display: block; width: 100%; margin: 8px 0 16px; padding: 12px; font: inherit; }
+    .capture-page video { width: 100%; border-radius: 12px; }
+    .capture-page [hidden] { display: none !important; }
+    .capture-page output { overflow-wrap: anywhere; }
+    ```
 
-## 4. Make your first scan
+    ```tsx App.tsx
+    import Capture from './Capture';
+    
+    export default function App() {
+      return <Capture />;
+    }
+    ```
 
-Open `/capture/` in your browser. Choose the country printed on your document, select its type, and click **Open camera**. Grant camera access and hold the requested side in view.
+    </CodeGroup>
 
-The SDK captures automatically when the document is readable. Follow the instruction to turn it over if a second side is required. When the completion message appears, copy the scan ID from the browser console.
+    The effect creates the SDK after the video element mounts. Cleanup releases the camera and scanner, including when initialization finishes after the component has unmounted. Capture state drives React’s controls and instructions.
 
-## 5. Retrieve the result
+    <Accordion title="Using a different React framework?">
+      Mount capture in a client-rendered route and keep initialization inside the effect. Serve the copied SDK assets at `/bouncr/`. Configure your bundler to leave the hosted module import intact; the example’s `@vite-ignore` comment does this for Vite.
+    </Accordion>
+  </Step>
+  <Step title="Make your first scan">
+    Run your application and open the route rendering `Capture`. Choose the country shown on your document, select its type, and press **Open camera**. Grant camera access and hold the requested side in view.
 
-From your backend or terminal, retrieve that scan’s result using your API credential:
+    The SDK captures automatically when the document is readable. Follow the instruction to turn it over if a second side is required. A completed scan displays **You’re all set** and its scan reference.
 
-```bash
-curl "$BOUNCR_API_URL/v1/scans/$SCAN_ID/result" \
-  -H "Authorization: Bearer $BOUNCR_API_TOKEN"
-```
+    <Tip>
+      Keep React Strict Mode enabled during development. The component handles effect cleanup and a late initialization result.
+    </Tip>
+  </Step>
+  <Step title="Retrieve the result">
+    Use the completed scan ID from your backend with a credential scoped to `scans:results:read`:
 
-Use a credential with `scans:results:read`. The response contains processing status, the verification result, and authorized document details. Use this server response to decide whether the customer can proceed.
+    ```bash
+    curl "$BOUNCR_API_URL/v1/scans/$SCAN_ID/result" \
+      -H "Authorization: Bearer $BOUNCR_API_TOKEN"
+    ```
+
+    Use the server result to decide the next step in your application. Replace the example’s completion message with your own review or onboarding screen.
+  </Step>
+</Steps>
 
 ## Next steps
 
-- [Customize capture](/external/customize) with your branding, instructions, and flashlight control.
-- [Handle results](/external/results) in your application’s workflow.
-- [Resume a scan](/external/resume) after a page refresh.
-- [Handle common errors](/external/recovery) with helpful recovery actions.
+<CardGroup cols={2}>
+  <Card title="Customize capture" icon="palette" href="/external/customize">
+    Add your own viewfinder, instructions, and flashlight control.
+  </Card>
+
+  <Card title="Handle results" icon="check" href="/external/results">
+    Use completed scans in your application’s workflow.
+  </Card>
+
+  <Card title="Resume a scan" icon="rotate-right" href="/external/resume">
+    Continue after refresh or interrupted capture.
+  </Card>
+
+  <Card title="Troubleshooting" icon="life-ring" href="/external/recovery">
+    Help customers recover from capture errors.
+  </Card>
+</CardGroup>

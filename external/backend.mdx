@@ -7,6 +7,10 @@ Add an authenticated endpoint that the Web SDK can call when a customer starts o
 
 ## Configure your credentials
 
+<Note>
+  Keep API credentials on your backend. The React app receives only the authorization needed for its capture.
+</Note>
+
 Keep these values in your backend environment:
 
 ```bash
@@ -102,10 +106,10 @@ app.post('/capture/authorize', async (req, res, next) => {
 });
 ```
 
-The SDK forwards `authorization` and `configuration` internally. Return these values unchanged from the browser’s `authorize` callback, as shown in the [quickstart](/external/web#3-initialize-capture).
+The SDK forwards `authorization` and `configuration` internally. Return these values unchanged from the browser’s `authorize` callback, as shown in the [React quickstart](/external/web).
 
 For a fresh application, create a fresh scan. For a refresh or interrupted capture, recover the existing ID from your application/session record.
 
 ## Next step
 
-Continue with the [Web quickstart](/external/web) to connect this endpoint to your capture page.
+Continue with the [React quickstart](/external/web) to connect this endpoint to your capture page.
