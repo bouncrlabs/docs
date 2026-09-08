@@ -31,7 +31,34 @@
           "icon": "newspaper"
         }
       ]
-    }
+    },
+    "groups": [
+      {
+        "group": "Getting started",
+        "pages": [
+          "external/overview",
+          "external/web"
+        ]
+      },
+      {
+        "group": "Guides",
+        "pages": [
+          "external/backend",
+          "external/customize",
+          "external/results",
+          "external/resume",
+          "external/recovery"
+        ]
+      },
+      {
+        "group": "Reference",
+        "pages": [
+          "external/documents",
+          "external/reference",
+          "external/api-reference"
+        ]
+      }
+    ]
   },
   "logo": {
     "light": "/logo/light.svg",
