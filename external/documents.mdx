@@ -1,0 +1,44 @@
+---
+title: "Supported documents"
+description: "Choose the documents your customers can capture."
+---
+
+The SDK supplies available countries and documents for your integration. Use those choices to build your selectors; they reflect your organization’s and venue’s capture settings.
+
+## Document types
+
+| Document | Issuing countries | What the customer captures |
+| --- | --- | --- |
+| Driver’s license | United States, Canada | Back with a readable PDF417 barcode; front when requested |
+| State or provincial ID | United States, Canada | Back with a readable PDF417 barcode; front when requested |
+| Passport | Available issuing countries | Full photo page, including the machine-readable text at the bottom |
+| Passport card | United States | Side containing the machine-readable text |
+| Permanent resident card | United States, Canada | Side containing the supported machine-readable text |
+| Visa | Available issuing countries | Visa page containing the machine-readable text |
+| Other travel document | Available issuing countries | Document page or side containing a supported machine-readable zone |
+
+Enhanced driver’s licenses appear under **Driver’s license**. Country selection refers to the document’s issuing country.
+
+## Restrict accepted documents
+
+Configure document restrictions for your organization or venue. For example, a passport-only flow shows passport choices; a driver’s-license flow offers countries where that document is supported.
+
+The SDK provides `countryCodes` and `allowedDocumentTypes` after authorization. Refresh the document choices when the customer changes country. See [Customize capture](./customize#choose-documents-before-opening-the-camera).
+
+## Capture one or both sides
+
+Enable `dual_document_capture` in the venue’s preferences to request the front of an ID after its barcode side. Passports use their photo page. Read the SDK’s required sides to display the current instruction.
+
+## Barcode and MRZ formats
+
+ID capture reads supported PDF417 barcodes. Travel-document capture reads the machine-readable zone (MRZ), the block of letters, digits, and `<` characters printed on the document.
+
+| MRZ format | Printed layout | Typical document |
+| --- | --- | --- |
+| TD1 | 3 lines, 30 characters each | Travel and identity cards |
+| TD2 | 2 lines, 36 characters each | Travel documents |
+| TD3 | 2 lines, 44 characters each | Passports |
+| MRV-A | 2 lines, 44 characters each | Visas |
+| MRV-B | 2 lines, 36 characters each | Visas |
+
+Ask the customer to keep the complete document and machine-readable text in view. For a document without a supported barcode or MRZ, offer another accepted document.

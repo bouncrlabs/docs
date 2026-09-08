@@ -41,11 +41,21 @@
       },
       {
         "group": "Guides",
-        "pages": []
+        "pages": [
+          "external/backend",
+          "external/customize",
+          "external/results",
+          "external/resume",
+          "external/recovery"
+        ]
       },
       {
         "group": "Reference",
-        "pages": []
+        "pages": [
+          "external/documents",
+          "external/reference",
+          "external/api-reference"
+        ]
       }
     ]
   },

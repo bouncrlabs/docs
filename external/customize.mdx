@@ -1,0 +1,88 @@
+---
+title: "Customize capture"
+description: "Build your capture screens with your own components, copy, and camera controls."
+---
+
+Start with the [quickstart](./web), then replace its HTML and styles with your application’s components. The SDK attaches the camera to your video element and reports state changes through `onState`.
+
+## Choose documents before opening the camera
+
+Use `state.countryCodes` for the country selector. When the customer confirms a country, request its document choices:
+
+```javascript
+capture.start(state.scanId, undefined, selectedCountry);
+```
+
+Build your document selector from `state.allowedDocumentTypes`, filtered by `supportedDocumentTypes`. When the customer chooses a document and presses your camera button:
+
+```javascript
+capture.start(state.scanId, selectedDocumentType, selectedCountry);
+```
+
+Use ISO two-letter country codes, such as `US` or `GB`. Display the country’s localized name in your interface. See [Supported documents](./documents) for document labels and capture instructions.
+
+## Style the camera view
+
+The video element belongs to your page. Use CSS to size it and add a fixed guide above it:
+
+```html
+<div class="viewfinder">
+  <video id="camera" autoplay playsinline muted></video>
+  <div class="guide" aria-hidden="true"></div>
+</div>
+```
+
+```css
+.viewfinder { position: relative; overflow: hidden; border-radius: 16px; }
+.viewfinder video { display: block; width: 100%; }
+.guide { position: absolute; inset: 8%; border: 2px solid white; border-radius: 12px; pointer-events: none; }
+.guide.ready { border-color: #16a34a; }
+```
+
+Set the guide’s ready state from `Guidance.HOLD_STILL`. Place the current instruction in a `role="status"` element above the viewfinder. Use a card-shaped guide for IDs and a page-shaped guide for passports.
+
+## Show the next required side
+
+Read `requiredSides` and `acceptedSides` to find the next image to request:
+
+```javascript
+const nextSide = state.requiredSides.find(side => !state.acceptedSides.includes(side));
+```
+
+For an ID, label the side **Back of ID** or **Front of ID**. For a passport, ask for its photo page. Update the instruction when the state changes; the capture sequence depends on the document and your venue settings.
+
+## Add a capture button
+
+Automatic capture is enabled by default. An optional button lets the customer request a capture manually:
+
+```javascript
+captureButton.onclick = () => capture.capture();
+```
+
+Show the button during `Phase.CAPTURING`. The SDK checks the current frame before accepting a manual capture.
+
+## Add a flashlight button
+
+Pass `onTorchChange` when creating the SDK instance. Show the button when `available` is true and use `enabled` to render its current state:
+
+```javascript
+onTorchChange({ available, enabled }) {
+  flashlightButton.hidden = !available;
+  flashlightButton.setAttribute('aria-pressed', String(enabled));
+  flashlightButton.onclick = async () => {
+    try {
+      await capture.setTorch(!enabled);
+    } catch {
+      flashlightMessage.textContent = 'Flashlight unavailable. Try a brighter area.';
+    }
+  };
+}
+```
+
+## Localize instructions
+
+Map `Guidance` and `ErrorCode` values to your message catalog. Use the SDK values to choose an action and your translated copy to explain it. The [troubleshooting guide](./recovery) provides suggested messages and recovery actions.
+
+## Clean up on navigation
+
+Call `capture.destroy()` when your component unmounts or the capture page closes. Call `capture.stop()` for a cancel button when you want to keep the instance available.

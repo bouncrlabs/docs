@@ -1,0 +1,111 @@
+---
+title: "Connect your backend"
+description: "Create a scan and authorize your customer to capture a document."
+---
+
+Add an authenticated endpoint that the Web SDK can call when a customer starts or resumes capture. Your endpoint creates a scan, requests a capture token, and returns the SDK initialization data.
+
+## Configure your credentials
+
+Keep these values in your backend environment:
+
+```bash
+BOUNCR_API_URL=https://api.bouncr.io
+BOUNCR_API_TOKEN=your_api_access_token
+BOUNCR_VENUE_ID=your_venue_id
+BOUNCR_CAPTURE_ORIGIN=https://app.example.com
+```
+
+Use the API environment supplied for your integration. Register the exact origin that serves your capture page, including the port for local development.
+
+Your API credential needs `scans:create` and `scans:capture`. Add `scans:results:read` when this backend also retrieves results.
+
+## Create a scan
+
+Send the venue ID to Bouncr:
+
+```bash
+curl "$BOUNCR_API_URL/v1/scans" \
+  -H "Authorization: Bearer $BOUNCR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"venue_id\":\"$BOUNCR_VENUE_ID\"}"
+```
+
+The API returns `201 Created` with the scan ID:
+
+```json
+{ "id": "128000000000000001" }
+```
+
+Store this ID on the customer’s application or onboarding record. Reuse it as the customer selects a document and completes capture.
+
+## Add the authorization endpoint
+
+The SDK calls your endpoint with its capture key and the customer’s document selection. Forward those values to Bouncr for the scan associated with the signed-in customer.
+
+This Express example belongs after your application’s authentication and session middleware. `req.user` identifies the signed-in customer; `req.session` is their server-side session. It uses one scan per onboarding session. For multiple applications per customer, store the scan ID on the corresponding application record instead.
+
+Install the supplied SDK package on the backend to use `@bouncr/capture/server`. Enable JSON request parsing before the route.
+
+```javascript
+import express from 'express';
+import { encodeConfiguration } from '@bouncr/capture/server';
+
+app.use(express.json());
+
+const apiUrl = process.env.BOUNCR_API_URL;
+const apiToken = process.env.BOUNCR_API_TOKEN;
+const venueId = process.env.BOUNCR_VENUE_ID;
+const captureOrigin = process.env.BOUNCR_CAPTURE_ORIGIN;
+
+app.post('/capture/authorize', async (req, res, next) => {
+  try {
+    if (!req.user || !req.session) return res.sendStatus(401);
+    if (req.get('origin') !== captureOrigin) return res.sendStatus(403);
+
+    const headers = {
+      Authorization: `Bearer ${apiToken}`,
+      'Content-Type': 'application/json',
+    };
+    let scanId = req.session.bouncrScanId;
+    if (!scanId) {
+      const created = await fetch(`${apiUrl}/v1/scans`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ venue_id: venueId }),
+      });
+      if (!created.ok) return res.sendStatus(created.status);
+      scanId = (await created.json()).id;
+      req.session.bouncrScanId = scanId;
+    }
+
+    const { thumbprint, country, documentType } = req.body;
+    const response = await fetch(`${apiUrl}/v1/scans/${scanId}/capture-authorizations`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        origin: captureOrigin,
+        capture_key_thumbprint: thumbprint,
+        country,
+        document_type: documentType,
+      }),
+    });
+    if (!response.ok) return res.sendStatus(response.status);
+
+    res.set('Cache-Control', 'no-store').json({
+      authorization: await response.text(),
+      configuration: encodeConfiguration(apiUrl, scanId),
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+```
+
+The SDK forwards `authorization` and `configuration` internally. Return these values unchanged from the browser’s `authorize` callback, as shown in the [quickstart](./web#3-initialize-capture).
+
+For a fresh application, create a fresh scan. For a refresh or interrupted capture, recover the existing ID from your application/session record.
+
+## Next step
+
+Continue with the [Web quickstart](./web) to connect this endpoint to your capture page.
