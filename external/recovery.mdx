@@ -38,6 +38,6 @@ After a capture has been accepted, changing documents requires a new scan. Use `
 
 ## Scanner startup fails
 
-Verify that `/bouncr/index.js` and its accompanying assets are served together. The capture page requires HTTPS or localhost. Check deployed script, worker, and API requests against your Content Security Policy.
+The capture page requires HTTPS or localhost. Allow `https://cdn.bouncr.io` in script and connection policy, `blob:` for workers, and WebAssembly compilation. Check failed runtime or API requests in the browser network panel.
 
 For support, include the SDK version, scan ID, browser/device version, error code, and failing step. The optional `onDiagnostics` callback provides timing data.

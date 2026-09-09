@@ -5,19 +5,18 @@ description: "Install the SDK and start capture in React."
 
 ## Install
 
-Install the SDK archive supplied by Bouncr:
+Set `BOUNCR_NPM_TOKEN` to the package download token supplied by Bouncr. Add this to your project’s `.npmrc`:
 
-```bash
-npm install ./bouncrlabs-idv.tgz
+```ini .npmrc
+@bouncrlabs:registry=https://registry.npmjs.org/
+//registry.npmjs.org/:_authToken=${BOUNCR_NPM_TOKEN}
 ```
 
-Copy the package assets into your application’s public directory:
-
 ```bash
-cp -R node_modules/@bouncrlabs/idv/dist public/bouncr
+npm install @bouncrlabs/idv
 ```
 
-Serve `/bouncr/` with the application over HTTPS or localhost. Keep these assets together when deploying or upgrading.
+The SDK loads its versioned runtime from `cdn.bouncr.io`. The npm token is for installation only; do not pass it to `createCapture`.
 
 ## Initialize
 
@@ -45,10 +44,9 @@ export function Capture({ token, configuration }: Props) {
     setLoadError(false);
     let disposed = false;
     let instance: CaptureInstance | undefined;
-    const url = '/bouncr/index.js';
 
     async function initialize() {
-      const module: SDK = await import(/* @vite-ignore */ url);
+      const module = await import('@bouncrlabs/idv');
       if (disposed || !video.current) return;
       instance = await module.createCapture({
         video: video.current,
