@@ -3,32 +3,27 @@ title: "Resume a scan"
 description: "Let customers continue capture after refreshing the page or returning later."
 ---
 
-Save the scan ID on your customer’s application record. Once `state.resumable` is true, Bouncr has accepted the first capture and can restore that progress.
+Save the scan ID on your customer’s application record when your backend creates it. Use that same scan when the customer returns to the capture page.
 
-## Save progress
+## Restore capture
 
-In your `onState` handler, persist the ID when the scan becomes resumable. For a single flow in one browser tab, session storage is enough:
+<Steps>
+  <Step title="Recover the customer's scan">
+    Load the scan ID from the authenticated customer’s application or server-side session. The [backend example](/external/backend) reuses this ID when loading onboarding data.
+  </Step>
+  <Step title="Issue a fresh initialization token">
+    Call `POST /v1/scans/:scan_id/capture-authorizations` for the existing scan with your registered capture-page origin. Return its `access_token` as `token`, together with `encodeConfiguration(apiUrl, scanId)`, through your onboarding response or page props.
+  </Step>
+  <Step title="Mount the capture screen">
+    Pass the new `token` and `configuration` to the [React component](/external/web). Its initialization effect calls `instance.start()` and restores the scan identified by the configuration.
+  </Step>
+</Steps>
 
-```javascript
-if (state.resumable && state.scanId) {
-  sessionStorage.setItem('bouncrScanId', state.scanId);
-}
-```
+Once `state.resumable` is true, Bouncr has accepted the first capture and can restore that progress. The SDK requests the remaining side. If capture is already complete, it proceeds to processing status. A refresh before the first accepted capture requires the customer to capture again.
 
-Use a key associated with the application/customer if your product can have several concurrent flows. Clear it on sign-out and after the flow finishes.
-
-## Continue capture
-
-Create a new SDK instance when the customer returns, then pass the saved ID:
-
-```javascript
-const scanId = sessionStorage.getItem('bouncrScanId');
-capture.start(scanId ?? undefined);
-```
-
-Your authorization endpoint checks the customer’s access and returns fresh initialization data for the existing scan. The [backend example](/external/backend) recovers the scan from the signed-in session.
-
-The SDK restores the accepted images and requests the remaining side. If capture is already complete, it proceeds to processing status. A refresh before the first accepted capture requires the customer to capture again.
+<Note>
+  Store the scan reference on your backend. Request a fresh initialization token when reopening the page; keep the token out of persistent browser storage.
+</Note>
 
 ## Handle another active window
 
@@ -36,11 +31,10 @@ When another window or device takes over the scan, the previous instance enters 
 
 ## Finish the flow
 
-Clear the saved reference once your application has handled completion:
+After processing finishes, continue to your application's next screen:
 
 ```javascript
 onComplete(scanId) {
-  sessionStorage.removeItem('bouncrScanId');
   window.location.assign('/onboarding/review');
 }
 ```

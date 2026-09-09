@@ -5,58 +5,62 @@ description: "Help customers correct a selection, enable their camera, and finis
 
 Use capture guidance for adjustments while the camera is running. When capture fails, read `state.error.code` and offer a recovery action.
 
-## The wrong country or document was selected
+<AccordionGroup>
+  <Accordion title="The wrong country or document was selected">
+    Using `sdk` and `state` from the React quickstart, show a specific message and return the customer to the relevant selector:
 
-Show a specific message and return the customer to the relevant selector:
+    ```tsx
+    const { ErrorCode } = sdk;
+    
+    const errorMessages = new Map([
+      [ErrorCode.COUNTRY_MISMATCH, 'Choose the country that issued this document.'],
+      [ErrorCode.DOCUMENT_TYPE_MISMATCH, 'Choose the type of document you are scanning.'],
+      [ErrorCode.CAMERA_PERMISSION_DENIED, 'Allow camera access in your browser settings, then try again.'],
+      [ErrorCode.CAMERA_UNAVAILABLE, 'Close other camera apps, then try again.'],
+    ]);
+    
+    const message = (state.error && errorMessages.get(state.error.code))
+      ?? 'Capture could not finish. Please try again.';
+    
+    return <p role="alert">{message}</p>;
+    ```
 
-```javascript
-import { ErrorCode } from '/bouncr/index.js';
+    Before the first capture is accepted, reopen selection with `capture.current?.start(state.scanId, undefined, state.country)`. Let the customer confirm the corrected selection, then open the camera again. To use a different document after capture has already been accepted, begin a new scan through your backend.
+  </Accordion>
 
-const errorMessages = new Map([
-  [ErrorCode.COUNTRY_MISMATCH, 'Choose the country that issued this document.'],
-  [ErrorCode.DOCUMENT_TYPE_MISMATCH, 'Choose the type of document you are scanning.'],
-  [ErrorCode.CAMERA_PERMISSION_DENIED, 'Allow camera access in your browser settings, then try again.'],
-  [ErrorCode.CAMERA_UNAVAILABLE, 'Close other camera apps, then try again.'],
-]);
+  <Accordion title="The camera will not open">
+    Check that the page uses HTTPS or localhost, camera permission is enabled, and another application is not using the camera. Give the customer a retry button after they change the permission or close the other application.
+  </Accordion>
 
-message.textContent = errorMessages.get(state.error?.code)
-  ?? 'Capture could not finish. Please try again.';
-```
+  <Accordion title="The document is in view but will not capture">
+    Display the latest `Guidance` value as one instruction at a time:
 
-Before the first capture is accepted, reopen selection with `capture.start(state.scanId, undefined, state.country)`. Let the customer confirm the corrected selection, then open the camera again. To use a different document after capture has already been accepted, begin a new scan through your backend.
+    | Guidance | Suggested instruction |
+    | --- | --- |
+    | `ALIGN_DOCUMENT` | Place your document inside the guide |
+    | `MOVE_CLOSER` | Move closer while keeping the document in focus |
+    | `IMPROVE_FOCUS` | Hold the document steady |
+    | `REDUCE_GLARE` | Tilt the document slightly to reduce glare |
+    | `CLEAR_BACKGROUND` | Place your document on a plain background |
+    | `HOLD_STILL` | Hold still; capturing automatically |
+    | `FLIP_DOCUMENT` | Turn your document over |
 
-## The camera will not open
+    For small text or barcodes, suggest better lighting or show the [flashlight control](/external/customize#add-a-flashlight-button) when available.
+  </Accordion>
 
-Check that the page uses HTTPS or localhost, camera permission is enabled, and another application is not using the camera. Give the customer a retry button after they change the permission or close the other application.
+  <Accordion title="Capture was interrupted">
+    Use the existing scan ID to [resume capture](/external/resume). Accepted images remain attached to that scan. Display upload or processing progress while the SDK recovers.
 
-## The document is in view but will not capture
+    For `UNAUTHORIZED`, reload your authenticated onboarding data to obtain fresh token/configuration props and initialize the capture component again. For `ACCESS_DENIED`, end the attempt and show your application’s support path.
+  </Accordion>
 
-Display the latest `Guidance` value as one instruction at a time:
+  <Accordion title="Capture moved to another window">
+    For `Phase.SUPERSEDED`, tell the customer to continue in the other window. Avoid automatically restarting both windows.
+  </Accordion>
 
-| Guidance | Suggested instruction |
-| --- | --- |
-| `ALIGN_DOCUMENT` | Place your document inside the guide |
-| `MOVE_CLOSER` | Move closer while keeping the document in focus |
-| `IMPROVE_FOCUS` | Hold the document steady |
-| `REDUCE_GLARE` | Tilt the document slightly to reduce glare |
-| `CLEAR_BACKGROUND` | Place your document on a plain background |
-| `HOLD_STILL` | Hold still; capturing automatically |
-| `FLIP_DOCUMENT` | Turn your document over |
+  <Accordion title="The scanner does not load">
+    Confirm that `/bouncr/index.js` and the accompanying SDK assets are available from your deployed page. Check browser console and network errors for blocked scripts, workers, or missing files. If you use a Content Security Policy, permit the SDK’s scripts, workers, and API connection.
 
-For small text or barcodes, suggest better lighting or show the [flashlight control](/external/customize#add-a-flashlight-button) when available.
-
-## Capture was interrupted
-
-Use the existing scan ID to [resume capture](/external/resume). Accepted images remain attached to that scan. Display upload or processing progress while the SDK recovers.
-
-For `UNAUTHORIZED`, return through your authenticated backend for fresh capture authorization. For `ACCESS_DENIED`, end the attempt and show your application’s support path.
-
-## Capture moved to another window
-
-For `Phase.SUPERSEDED`, tell the customer to continue in the other window. Avoid automatically restarting both windows.
-
-## The scanner does not load
-
-Confirm that `/bouncr/index.js` and the accompanying SDK assets are available from your deployed page. Check browser console and network errors for blocked scripts, workers, or missing files. If you use a Content Security Policy, permit the SDK’s scripts, workers, and API connection.
-
-When contacting support, include the SDK version, scan ID if available, browser/device version, error code, and the step that failed. Keep document images and credentials out of ordinary logs.
+    When contacting support, include the SDK version, scan ID if available, browser/device version, error code, and the step that failed. Keep document images and credentials out of ordinary logs.
+  </Accordion>
+</AccordionGroup>

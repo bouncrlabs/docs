@@ -12,9 +12,9 @@ Add country and document selection, a live camera preview, automatic capture, an
 
 <Steps>
   <Step title="Connect your backend">
-    Follow [Connect your backend](/external/backend) to add `/capture/authorize` using your existing signed-in session. Keep this route on the same origin as your React app, or proxy it there in development.
+    Follow [Connect your backend](/external/backend) to include capture initialization data in your existing onboarding response or server-rendered page props.
 
-    The browser receives authorization for one scan. Your backend keeps the API credential and retrieves verification results.
+    Pass the returned `token` and `configuration` to your capture screen. Your backend keeps the organization API credential and retrieves verification results.
   </Step>
   <Step title="Install the SDK">
     In your React app, install the supplied archive. Replace the filename with the one you received.
@@ -56,7 +56,12 @@ Add country and document selection, a live camera preview, automatic capture, an
     type SDK = typeof import('@bouncr/capture');
     type CaptureInstance = Awaited<ReturnType<SDK['createCapture']>>;
     
-    export default function Capture() {
+    export type CaptureProps = {
+      token: string;
+      configuration: string;
+    };
+    
+    export default function Capture({ token, configuration }: CaptureProps) {
       const video = useRef<HTMLVideoElement>(null);
       const capture = useRef<CaptureInstance | null>(null);
       const [sdk, setSdk] = useState<SDK>();
@@ -67,6 +72,11 @@ Add country and document selection, a live camera preview, automatic capture, an
       const [pending, setPending] = useState(true);
     
       useEffect(() => {
+        setState(undefined);
+        setDocumentType('');
+        setCompletedId('');
+        setLoadError('');
+        setPending(true);
         let disposed = false;
         let instance: CaptureInstance | undefined;
     
@@ -77,16 +87,8 @@ Add country and document selection, a live camera preview, automatic capture, an
           if (disposed || !video.current) return;
           instance = await module.createCapture({
             video: video.current,
-            authorize: async ({ signal, ...request }) => {
-              const response = await fetch('/capture/authorize', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(request),
-                signal,
-              });
-              if (!response.ok) throw new Error('Unable to authorize capture');
-              return response.json();
-            },
+            token,
+            configuration,
             onState(next) {
               if (disposed) return;
               setState(next);
@@ -110,7 +112,7 @@ Add country and document selection, a live camera preview, automatic capture, an
           instance?.destroy();
           capture.current = null;
         };
-      }, []);
+      }, [token, configuration]);
     
       const selecting = !!sdk && state?.phase === sdk.Phase.SELECTING_DOCUMENT;
       const capturing = !!sdk && state?.phase === sdk.Phase.CAPTURING;
@@ -206,15 +208,16 @@ Add country and document selection, a live camera preview, automatic capture, an
 
     ```tsx App.tsx
     import Capture from './Capture';
+    import type { CaptureProps } from './Capture';
     
-    export default function App() {
-      return <Capture />;
+    export default function App({ capture }: { capture: CaptureProps }) {
+      return <Capture {...capture} />;
     }
     ```
 
     </CodeGroup>
 
-    The effect creates the SDK after the video element mounts. Cleanup releases the camera and scanner, including when initialization finishes after the component has unmounted. Capture state drives React’s controls and instructions.
+    Supply `App` with the `capture` object from your authenticated onboarding response or page loader. The effect creates the SDK after the video element mounts. Cleanup releases the camera and scanner, including when initialization finishes after the component has unmounted. Capture state drives React’s controls and instructions. When fresh token/configuration props arrive, the effect releases the previous instance and initializes the replacement.
 
     <Accordion title="Using a different React framework?">
       Mount capture in a client-rendered route and keep initialization inside the effect. Serve the copied SDK assets at `/bouncr/`. Configure your bundler to leave the hosted module import intact; the example’s `@vite-ignore` comment does this for Vite.

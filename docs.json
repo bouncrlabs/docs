@@ -43,8 +43,18 @@
         "group": "Reference",
         "pages": [
           "external/documents",
-          "external/reference",
-          "external/api-reference"
+          "external/reference"
+        ]
+      },
+      {
+        "group": "HTTP API",
+        "pages": [
+          "external/api-reference",
+          "external/api/create-scan",
+          "external/api/authorize-capture",
+          "external/api/get-scan",
+          "external/api/get-result",
+          "external/api/list-scans"
         ]
       }
     ]
@@ -57,7 +67,7 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:hello@bouncrlabs.com"
       }
     ],
     "primary": {
@@ -85,5 +95,11 @@
   },
   "appearance": {
     "strict": true
+  },
+  "api": {
+    "openapi": "openapi.json",
+    "examples": {
+      "autogenerate": true
+    }
   }
 }

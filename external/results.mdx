@@ -24,7 +24,23 @@ onComplete(scanId) {
 }
 ```
 
-Have your review route look up the scan associated with the signed-in customer and retrieve its result. The completion callback signals finished processing; the API response supplies the verification decision.
+<Note>
+  The completion callback signals finished processing. Retrieve the verification decision from your backend before advancing the customer.
+</Note>
+
+Have your review route look up the scan associated with the signed-in customer and retrieve its result.
+
+## Personalize the completion message
+
+To add a name to the quickstart’s completion screen, render `state.givenName` as ordinary React text:
+
+```tsx
+{completedId && (
+  <h2>{state?.givenName ? `You’re all set, ${state.givenName}.` : 'You’re all set.'}</h2>
+)}
+```
+
+The name comes from the submitted document after the required captures have been accepted. Use the generic message when it is empty. This greeting acknowledges completion; your backend still retrieves the verification decision before deciding the customer’s next step.
 
 ## Retrieve a result
 
@@ -47,39 +63,39 @@ If processing is still running, keep the customer in your processing state and c
 
 Detailed result fields depend on the checks enabled for your integration. Treat an absent check as unavailable. Fetching the scan later returns its latest authorized result.
 
-Example response, showing selected fields:
+<Accordion title="Example completed result" defaultOpen>
+  Selected fields from a completed scan:
 
-```json
-{
-  "scan_id": "128000000000000001",
-  "complete": true,
-  "verification": {
-    "decision": "DECISION_ACCEPT",
-    "integrity": "INTEGRITY_REAL",
-    "of_age": true,
-    "not_expired": true
-  },
-  "document": {
-    "given_name": "Alex",
-    "surname": "Morgan",
-    "date_of_birth": "1995-06-15",
-    "issuing_country": "US"
+  ```json
+  {
+    "scan_id": "128000000000000001",
+    "complete": true,
+    "verification": {
+      "decision": "DECISION_ACCEPT",
+      "integrity": "INTEGRITY_REAL",
+      "of_age": true,
+      "not_expired": true
+    },
+    "document": {
+      "given_name": "Alex",
+      "surname": "Morgan",
+      "date_of_birth": "1995-06-15",
+      "issuing_country": "US"
+    }
   }
-}
-```
+  ```
+</Accordion>
 
 ### Interpret the decision
 
 | `verification.decision` | Meaning |
 | --- | --- |
-| `DECISION_ACCEPT` | Accepted by the configured checks |
-| `DECISION_REJECT` | Rejected by the configured checks |
+| `DECISION_ACCEPT` | Accepted |
+| `DECISION_REJECT` | Rejected |
 | `DECISION_VERIFY` | Requires further verification or review |
-| `DECISION_ACCEPT_BY_AUTHORIZED_ACTOR` | Accepted through an authorized override |
-| `DECISION_REJECT_BY_AUTHORIZED_ACTOR` | Rejected through an authorized override |
 | `DECISION_UNSPECIFIED` | No decision available |
 
-Your application determines how to handle review and authorized overrides. Evaluate `complete` before taking a final action.
+Your application determines how to handle scans that require review. Evaluate `complete` before taking a final action.
 
 ### Interpret individual checks
 
