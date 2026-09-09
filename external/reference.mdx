@@ -1,160 +1,90 @@
 ---
 title: "Web SDK reference"
-description: "Initialization options, instance methods, and capture events."
+description: "Options, methods, state, and callbacks."
 ---
-
-For a working example, start with the [React quickstart](/external/web).
 
 ## createCapture(options)
 
-Creates a capture instance and loads the scanner. Returns a promise that resolves to the instance. Initialize after your video element is mounted.
+Initializes the SDK and loads the scan’s state. Returns a promise for the capture instance. Camera access begins with `start()`.
 
-```javascript
-import { createCapture } from '/bouncr/index.js';
+<ParamField body="video" type="HTMLVideoElement" required>
+Mounted preview element.
+</ParamField>
+<ParamField body="token" type="string" required>
+Capture token returned by the API.
+</ParamField>
+<ParamField body="configuration" type="string" required>
+Configuration returned with the capture token. Pass unchanged.
+</ParamField>
+<ParamField body="onState" type="(state: CaptureState) => void" required>
+Receives lifecycle, selection, guidance, and error updates.
+</ParamField>
+<ParamField body="maxAnalysisFps" type="number" default="30">
+Analysis ceiling, from 1 to 30. Actual analysis rate adapts to device performance.
+</ParamField>
 
-const capture = await createCapture({
-  video,
-  token,
-  configuration,
-  onState,
-});
-```
+### Callbacks
 
-### Required options
-
-| Option | Type | Description |
+| Option | Signature | Trigger |
 | --- | --- | --- |
-| `video` | `HTMLVideoElement` | Element used for the camera preview |
-| `token` | `string` | Initialization token issued by your backend for this scan; initialize before it expires (up to 10 minutes) |
-| `configuration` | `string` | Encoded configuration supplied by your backend for the same scan |
-| `onState` | `(state: CaptureState) => void` | Called when capture state or guidance changes |
+| `onCaptureComplete` | `(scanId: string) => void` | All required captures accepted. |
+| `onComplete` | `(scanId: string) => void` | Processing finished. |
+| `onTorchChange` | `(state: TorchState) => void` | Flashlight availability or enabled state changed. |
+| `onJobStatus` | `(status: SubscribeJobStatusResponse) => void` | Processing job updated. |
+| `onDiagnostics` | `(data: CaptureDiagnostics) => void` | Timing and geometry diagnostics available. |
 
-### Optional callbacks and options
+## Methods
 
-| Option | Type | Description |
+| Method | Returns | Behavior |
 | --- | --- | --- |
-| `onCaptureComplete` | `(scanId: string) => void` | Required captures have been accepted |
-| `onComplete` | `(scanId: string) => void` | Scan processing has finished |
-| `onTorchChange` | `({ available, enabled }) => void` | Flashlight availability and state; both values are booleans |
-| `onJobStatus` | Job-status callback | Additional processing progress for an advanced progress view |
-| `onDiagnostics` | Diagnostics callback | Optional startup/frame timing data for troubleshooting |
-| `maxAnalysisFps` | `number` | Analysis-rate ceiling; default `30` |
-
-Keep callbacks short. Use [Handle results](/external/results) for application decisions and [Customize capture](/external/customize) for camera controls.
-
-Your backend supplies `token` and `configuration` with your page or onboarding data. See [Connect your backend](/external/backend). To initialize a new instance after a refresh, obtain a fresh token for the same scan.
-
-## Instance methods
-
-### start(scanId?, documentType?, country?)
-
-Starts or resumes capture. Returns `void`; progress arrives through `onState`.
-
-```javascript
-capture.start();
-capture.start(existingScanId);
-capture.start(existingScanId, undefined, 'US');
-capture.start(existingScanId, DocumentType.DRIVERS_LICENSE, 'US');
-```
-
-For a new scan, the SDK requests a country and document selection. For an existing scan, it restores the selection and accepted captures. A permitted selection starts the camera when more images are needed.
-
-### capture()
-
-Requests manual capture using the current camera frame. Returns `void`. Available while capturing; the frame must satisfy the capture quality checks.
-
-### stop()
-
-Cancels the active capture and releases the camera. Returns `void`. Call `start()` to begin again with the same instance.
-
-### destroy()
-
-Releases the camera and SDK resources. Returns `void`. Call when leaving the page or unmounting the component. Create a new instance before starting again.
-
-### setTorch(enabled)
-
-Turns the active camera’s flashlight on or off. Returns `Promise<void>`. Rejects if the camera or flashlight is unavailable. Read availability through `onTorchChange`.
-
-### setAnalysisFps(value)
-
-Changes the analysis-rate ceiling. Returns `void`. Capture automatically adapts to the device’s processing time within this limit.
+| `update({ country?, documentType? })` | `void` | Changes the selection before any capture is accepted. Country uses an ISO alpha-2 code; document type uses `DocumentType`. |
+| `start()` | `void` | Starts the camera from `READY`, or resumes a stopped capture. |
+| `capture()` | `void` | Requests manual capture during `CAPTURING`. |
+| `stop()` | `void` | Stops capture and releases the camera. |
+| `destroy()` | `void` | Releases the instance and its resources. |
+| `setTorch(enabled: boolean)` | `Promise<void>` | Sets the flashlight; rejects when unavailable. |
+| `setAnalysisFps(value: number)` | `void` | Updates the analysis ceiling; values outside 1–30 throw. |
 
 ## CaptureState
 
-<ResponseField name="phase" type="Phase value">
-  Current stage
-</ResponseField>
+| Field | Type | Description |
+| --- | --- | --- |
+| `phase` | `Phase` | Lifecycle state, listed below. |
+| `guidance` | `Guidance` | Capture feedback. |
+| `scanId` | `string?` | Scan identifier. |
+| `resumable` | `boolean` | Accepted captures are available to restore. |
+| `countryCodes` | `string[]` | Available issuing countries. |
+| `country` | `string` | Selected ISO alpha-2 country; empty before selection. |
+| `allowedDocumentTypes` | `DocumentType[]` | Available types for the selected country. |
+| `documentType` | `DocumentType` | Selected type. |
+| `side` | `Side` | Requested side: `FRONT`, `REAR`, or `UNSPECIFIED`. |
+| `givenName` | `string` | Given name after capture; empty when unavailable. |
+| `error` | `{ code: ErrorCode; status: number }?` | Capture failure. |
 
-<ResponseField name="guidance" type="Guidance value">
-  Current camera instruction
-</ResponseField>
+Selection arrays are empty once capture has been accepted.
 
-<ResponseField name="scanId" type="string, optional">
-  ID for this scan
-</ResponseField>
+### Phase
 
-<ResponseField name="resumable" type="boolean">
-  Accepted capture can be restored
-</ResponseField>
-
-<ResponseField name="countryCodes" type="string[]">
-  Available issuing countries
-</ResponseField>
-
-<ResponseField name="country" type="string">
-  Selected country; empty before selection
-</ResponseField>
-
-<ResponseField name="allowedDocumentTypes" type="DocumentType[] values">
-  Document choices allowed for this selection
-</ResponseField>
-
-<ResponseField name="documentType" type="DocumentType value">
-  Selected document
-</ResponseField>
-
-<ResponseField name="requiredSides" type="Side[] values">
-  Requested capture sides
-</ResponseField>
-
-<ResponseField name="acceptedSides" type="Side[] values">
-  Sides already accepted
-</ResponseField>
-
-<ResponseField name="givenName" type="string">
-  Given name parsed from the submitted document after all required captures are accepted; empty when unavailable. Use it for an optional completion greeting. See [Handle results](/external/results#personalize-the-completion-message).
-</ResponseField>
-
-<ResponseField name="error" type="{ code: ErrorCode, status: number }, optional">
-  Failure details; status is `0` for a local SDK error
-</ResponseField>
-
-Use the exported enums to compare values. The SDK also exports `supportedDocumentTypes` for filtering document choices to the installed package’s capabilities.
-
-### Phase values
-
-| Value | Meaning |
+| Value | State |
 | --- | --- |
-| `AUTHORIZING` | Requesting scan access |
-| `SELECTING_DOCUMENT` | Waiting for country/document selection |
-| `CAPTURING` | Camera capture is active |
-| `SUBMITTING` | Uploading a captured image |
-| `PROCESSING` | Waiting for scan processing |
-| `COMPLETE` | Processing finished |
-| `FAILED` | Capture could not continue; inspect `error` |
-| `SUPERSEDED` | Another capture instance took over |
-| `STOPPED` | Capture was canceled |
+| `AUTHORIZING` | Initializing the scan. |
+| `SELECTING_COUNTRY` | Awaiting country selection. |
+| `SELECTING_DOCUMENT` | Awaiting document selection. |
+| `UPDATING` | Saving selection. |
+| `READY` | Ready for `start()`. |
+| `CAPTURING` | Camera capture active. |
+| `SUBMITTING` | Submitting captured evidence. |
+| `PROCESSING` | Server processing in progress. |
+| `COMPLETE` | Processing finished. |
+| `FAILED` | Failed; see `error.code`. |
+| `SUPERSEDED` | Another instance took over the scan. |
+| `STOPPED` | Capture stopped. |
 
-See [Troubleshooting](/external/recovery) for guidance and error recovery.
+### TorchState
 
-## Server helper
+| Field | Type |
+| --- | --- |
+| `available` | `boolean` |
+| `enabled` | `boolean` |
 
-Import this helper in your backend:
-
-```javascript
-import { encodeConfiguration } from '@bouncr/capture/server';
-
-const configuration = encodeConfiguration(apiUrl, scanId);
-```
-
-`apiUrl` is the integration’s API base URL. `scanId` is the scan created by your backend. The helper returns the string passed as `configuration` to `createCapture`.
+See [Errors](/external/recovery) for recovery and [Results](/external/results) for verification decisions.

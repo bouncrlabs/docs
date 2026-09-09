@@ -1,31 +1,3 @@
----
-title: "Web integration"
-description: "Install the SDK and start capture in React."
----
-
-## Install
-
-Install the SDK archive supplied by Bouncr:
-
-```bash
-npm install ./bouncrlabs-idv.tgz
-```
-
-Copy the package assets into your application’s public directory:
-
-```bash
-cp -R node_modules/@bouncrlabs/idv/dist public/bouncr
-```
-
-Serve `/bouncr/` with the application over HTTPS or localhost. Keep these assets together when deploying or upgrading.
-
-## Initialize
-
-[Create a scan](/external/backend) on your backend. Pass the returned `capture.token` and `capture.configuration` to the component.
-
-This example uses a scan created with `country` and `document_type` already selected. For selection during capture, connect the [document controls](/external/customize#select-a-document) to the same instance.
-
-```tsx Capture.tsx
 import { useEffect, useRef, useState } from 'react';
 import type { CaptureOptions, CaptureState } from '@bouncrlabs/idv';
 
@@ -86,10 +58,3 @@ export function Capture({ token, configuration }: Props) {
     </section>
   );
 }
-```
-
-## Receive completion
-
-Add `onCaptureComplete` to receive the scan ID when all required captures are accepted, or `onComplete` when processing finishes. Retrieve verification results from your backend using [Retrieve a scan](/external/api/get-scan).
-
-[Capture controls](/external/customize) covers document selection, manual capture, and flashlight access. See the [SDK reference](/external/reference) for all options and callbacks.

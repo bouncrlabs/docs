@@ -1,42 +1,25 @@
 ---
 title: "Resume a scan"
-description: "Let customers continue capture after refreshing the page or returning later."
+description: "Restore accepted captures when a customer returns to your flow."
 ---
 
-Save the scan ID on your customer’s application record when your backend creates it. Use that same scan when the customer returns to the capture page.
+Save the scan ID with your application record. When the customer returns, reuse that scan and request a fresh [initialization token](/external/api/create-token).
 
-## Restore capture
+Initialize a new SDK instance with the fresh token and the same scan’s configuration, The SDK restores the scan’s state. Call `start()` when it enters `Phase.READY` to capture any remaining side.
 
-<Steps>
-  <Step title="Recover the customer's scan">
-    Load the scan ID from the authenticated customer’s application or server-side session. The [backend example](/external/backend) reuses this ID when loading onboarding data.
-  </Step>
-  <Step title="Issue a fresh initialization token">
-    Call `POST /v1/scans/:scan_id/capture-authorizations` for the existing scan with your registered capture-page origin. Return its `access_token` as `token`, together with `encodeConfiguration(apiUrl, scanId)`, through your onboarding response or page props.
-  </Step>
-  <Step title="Mount the capture screen">
-    Pass the new `token` and `configuration` to the [React component](/external/web). Its initialization effect calls `instance.start()` and restores the scan identified by the configuration.
-  </Step>
-</Steps>
+| Saved progress | What happens on resume |
+| --- | --- |
+| No accepted capture | The SDK restores the saved selection, or requests any missing selection. |
+| At least one accepted side | The SDK requests the remaining capture. `state.resumable` is `true`. |
+| All required captures accepted | The SDK reports processing progress. |
+| Processing complete | The SDK reports completion. Retrieve the result from your backend. |
 
-Once `state.resumable` is true, Bouncr has accepted the first capture and can restore that progress. The SDK requests the remaining side. If capture is already complete, it proceeds to processing status. A refresh before the first accepted capture requires the customer to capture again.
+## Cancel and restart in the same page
 
-<Note>
-  Store the scan reference on your backend. Request a fresh initialization token when reopening the page; keep the token out of persistent browser storage.
-</Note>
+Call `stop()` to cancel capture and release the camera. Call `start()` to continue using the same instance. Call `destroy()` when leaving the capture page; a destroyed instance cannot restart.
 
-## Handle another active window
+## Another active window
 
-When another window or device takes over the scan, the previous instance enters `Phase.SUPERSEDED`. Show a message directing the customer to continue in the other window. Offer a deliberate **Continue here** action if your product allows switching back.
+`Phase.SUPERSEDED` means another instance has taken over the scan. Direct the customer to continue there. If you offer **Continue here**, obtain fresh initialization data and create a new instance after the customer chooses it.
 
-## Finish the flow
-
-After processing finishes, continue to your application's next screen:
-
-```javascript
-onComplete(scanId) {
-  window.location.assign('/onboarding/review');
-}
-```
-
-Keep the scan ID on your backend record so you can [retrieve its result](/external/results) later.
+To submit a different document after evidence has been accepted, create a new scan. See [Troubleshooting](/external/recovery) for correcting a selection before that point.

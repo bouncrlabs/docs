@@ -1,125 +1,52 @@
 ---
-title: "Customize capture"
-description: "Use your own React components, instructions, and camera controls."
+title: "Capture controls"
+description: "Select a document, start capture, and control the camera."
 ---
 
-Start with the [React quickstart](/external/web). The examples below use its `sdk`, `state`, `video`, and `capture` refs. Add controls to the component’s JSX and callbacks to its `createCapture` options.
+## Select a document
 
-## Choose documents before opening the camera
+Initialization loads the scan’s current selection and available choices without opening the camera.
 
-Use `state.countryCodes` for the country selector and `state.allowedDocumentTypes` for its document choices. The quickstart filters those choices against `supportedDocumentTypes`.
+Use `state.countryCodes` for the country picker. Selecting a country loads its permitted document types:
 
-<Tabs>
-  <Tab title="Country selection">
-    Request document choices when the customer selects a country:
-
-    ```tsx
-    capture.current?.start(state?.scanId, undefined, selectedCountry);
-    ```
-  </Tab>
-  <Tab title="Open camera">
-    Open capture after the customer chooses a document:
-
-    ```tsx
-    capture.current?.start(state?.scanId, selectedDocumentType, selectedCountry);
-    ```
-  </Tab>
-</Tabs>
-
-Use ISO two-letter country codes, such as `US` or `GB`, and display localized country names. See [Supported documents](/external/documents) for labels and capture instructions.
-
-## Style the camera view
-
-Replace the quickstart’s video element with this viewfinder. Keep the video mounted, even while its container is hidden.
-
-<CodeGroup>
-
-```tsx Viewfinder
-<div className="viewfinder" hidden={!capturing}>
-  <video ref={video} autoPlay playsInline muted />
-  <div
-    className={`guide ${state?.guidance === sdk?.Guidance.HOLD_STILL ? 'ready' : ''}`}
-    aria-hidden="true"
-  />
-</div>
+```typescript
+capture.update({ country: selectedCountry });
 ```
 
-```css Styles
-.viewfinder { position: relative; overflow: hidden; border-radius: 16px; }
-.viewfinder video { display: block; width: 100%; }
-.guide { position: absolute; inset: 8%; border: 2px solid white; border-radius: 12px; pointer-events: none; }
-.guide.ready { border-color: #16a34a; }
+Use `state.allowedDocumentTypes` for the document picker:
+
+```typescript
+capture.update({ documentType: selectedDocumentType });
 ```
 
-</CodeGroup>
+Both choices come from the scan’s venue policy. You can also supply them when [creating the scan](/external/api/create-scan).
 
-Place the instruction above the viewfinder in a `role="status"` element. Use a card-shaped guide for IDs and a page-shaped guide for passports. Keep the guide fixed; change its color when the SDK reports `HOLD_STILL`.
+## Start capture
 
-## Show the next required side
+After selection, the SDK enters `Phase.READY`. Call `start()` to open the camera:
 
-Read `requiredSides` and `acceptedSides` to find the next image:
-
-```tsx
-const nextSide = state?.requiredSides.find(side => !state.acceptedSides.includes(side));
+```typescript
+capture.start();
 ```
 
-For an ID, show **Back of ID** or **Front of ID**. For a passport, ask for its photo page. The quickstart’s `instruction` function already makes this distinction.
+`state.side` identifies the requested side and `state.guidance` reports capture feedback. The SDK captures automatically and advances through the required sides.
 
-## Add a capture button
+## Manual capture
 
-Automatic capture is enabled by default. Add a manual action while capturing:
-
-```tsx
-{capturing && <button onClick={() => capture.current?.capture()}>Capture now</button>}
+```typescript
+capture.capture();
 ```
 
-The SDK checks the current frame before accepting a manual capture.
+Available during `Phase.CAPTURING`.
 
-## Add a flashlight button
+## Flashlight
 
-<Steps>
-  <Step title="Track flashlight state">
-    Add these hooks inside `Capture`, alongside its existing state:
+Use `onTorchChange` to receive flashlight availability and its enabled state. When available:
 
-    ```tsx
-    const [torch, setTorch] = useState({ available: false, enabled: false });
-    const [torchError, setTorchError] = useState('');
-    ```
-  </Step>
-  <Step title="Listen for camera capabilities">
-    Add this callback to `createCapture` inside the quickstart’s effect:
+```typescript
+await capture.setTorch(!torch.enabled);
+```
 
-    ```tsx
-    onTorchChange(next) {
-      if (!disposed) setTorch(next);
-    },
-    ```
-  </Step>
-  <Step title="Render the control">
-    Add this JSX beside the cancel button:
+## Stop and release
 
-    ```tsx
-    {capturing && torch.available && (
-      <button aria-pressed={torch.enabled} onClick={async () => {
-        setTorchError('');
-        try {
-          await capture.current?.setTorch(!torch.enabled);
-        } catch {
-          setTorchError('Flashlight unavailable. Try a brighter area.');
-        }
-      }}>
-        {torch.enabled ? 'Turn flashlight off' : 'Turn flashlight on'}
-      </button>
-    )}
-    {torchError && <p role="status">{torchError}</p>}
-    ```
-  </Step>
-</Steps>
-
-## Localize instructions
-
-Map `Guidance` and `ErrorCode` values to your message catalog. Use SDK values to select an action and translated copy to explain it. The [troubleshooting guide](/external/recovery) suggests messages and recovery actions.
-
-## Clean up on navigation
-
-The quickstart’s effect calls `destroy()` on unmount. Keep that cleanup when moving capture into your router, modal, or onboarding flow. Use `stop()` for a cancel action when you want to keep the instance available.
+`stop()` releases the camera while preserving the instance. `start()` resumes it. Call `destroy()` when leaving capture.

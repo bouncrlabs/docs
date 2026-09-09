@@ -1,66 +1,43 @@
 ---
-title: "Troubleshooting"
-description: "Help customers correct a selection, enable their camera, and finish capture."
+title: "Errors"
+description: "Handle capture errors and help customers complete their scan."
 ---
 
-Use capture guidance for adjustments while the camera is running. When capture fails, read `state.error.code` and offer a recovery action.
+Handle initialization errors by catching the `createCapture()` promise. After initialization, failures appear in `onState` with `Phase.FAILED` and `state.error`.
 
-<AccordionGroup>
-  <Accordion title="The wrong country or document was selected">
-    Using `sdk` and `state` from the React quickstart, show a specific message and return the customer to the relevant selector:
+## Recovery actions
 
-    ```tsx
-    const { ErrorCode } = sdk;
-    
-    const errorMessages = new Map([
-      [ErrorCode.COUNTRY_MISMATCH, 'Choose the country that issued this document.'],
-      [ErrorCode.DOCUMENT_TYPE_MISMATCH, 'Choose the type of document you are scanning.'],
-      [ErrorCode.CAMERA_PERMISSION_DENIED, 'Allow camera access in your browser settings, then try again.'],
-      [ErrorCode.CAMERA_UNAVAILABLE, 'Close other camera apps, then try again.'],
-    ]);
-    
-    const message = (state.error && errorMessages.get(state.error.code))
-      ?? 'Capture could not finish. Please try again.';
-    
-    return <p role="alert">{message}</p>;
-    ```
+| Error | Meaning | Action |
+| --- | --- | --- |
+| `COUNTRY_MISMATCH` | The captured document’s issuer differs from the selection. | Ask the customer to correct the issuing country. |
+| `DOCUMENT_TYPE_MISMATCH` | The captured document differs from the selected type. | Reopen document selection. |
+| `CAMERA_PERMISSION_DENIED` | The browser has not granted camera access. | Ask the customer to enable permission, then retry. |
+| `CAMERA_UNAVAILABLE` | The requested camera cannot be opened. | Ask the customer to close another camera app or choose another device. |
+| `UNAUTHORIZED` | Capture credentials are no longer accepted. | Obtain fresh initialization data for the same scan and recreate the instance. |
+| `ACCESS_DENIED` | The integration is not permitted to perform the operation. | Check credential scopes, venue access, and capture admission. |
+| `NOT_FOUND` | The scan is missing or inaccessible. | Check the scan associated with this application on your backend. |
+| `NETWORK_ERROR` | A request could not reach Bouncr. | Let automatic recovery run; offer [resume](/external/resume) if capture fails. |
+| `INVALID_AUTHORIZATION` | Initialization token or configuration is invalid. | Check that both values belong to the same scan and environment. |
+| `CAPTURE_FAILED` | Capture could not continue. | Offer a retry; record the scan ID and device/browser version for support. |
 
-    Before the first capture is accepted, reopen selection with `capture.current?.start(state.scanId, undefined, state.country)`. Let the customer confirm the corrected selection, then open the camera again. To use a different document after capture has already been accepted, begin a new scan through your backend.
-  </Accordion>
+Other error codes identify invalid requests, responses, or evidence. Keep them for diagnostics and show a retry/support action rather than exposing the raw code to the customer.
 
-  <Accordion title="The camera will not open">
-    Check that the page uses HTTPS or localhost, camera permission is enabled, and another application is not using the camera. Give the customer a retry button after they change the permission or close the other application.
-  </Accordion>
+## Correct a selection
 
-  <Accordion title="The document is in view but will not capture">
-    Display the latest `Guidance` value as one instruction at a time:
+Before the first capture is accepted, reopen country or document selection:
 
-    | Guidance | Suggested instruction |
-    | --- | --- |
-    | `ALIGN_DOCUMENT` | Place your document inside the guide |
-    | `MOVE_CLOSER` | Move closer while keeping the document in focus |
-    | `IMPROVE_FOCUS` | Hold the document steady |
-    | `REDUCE_GLARE` | Tilt the document slightly to reduce glare |
-    | `CLEAR_BACKGROUND` | Place your document on a plain background |
-    | `HOLD_STILL` | Hold still; capturing automatically |
-    | `FLIP_DOCUMENT` | Turn your document over |
+```typescript
+capture.update({ country: correctedCountry, documentType: correctedDocumentType });
+```
 
-    For small text or barcodes, suggest better lighting or show the [flashlight control](/external/customize#add-a-flashlight-button) when available.
-  </Accordion>
+After a capture has been accepted, changing documents requires a new scan. Use `state.resumable` to distinguish these cases.
 
-  <Accordion title="Capture was interrupted">
-    Use the existing scan ID to [resume capture](/external/resume). Accepted images remain attached to that scan. Display upload or processing progress while the SDK recovers.
+## Capture moved to another window
 
-    For `UNAUTHORIZED`, reload your authenticated onboarding data to obtain fresh token/configuration props and initialize the capture component again. For `ACCESS_DENIED`, end the attempt and show your application’s support path.
-  </Accordion>
+`Phase.SUPERSEDED` means another instance took over. Direct the customer there instead of repeatedly restarting this instance. See [Resume a scan](/external/resume#another-active-window).
 
-  <Accordion title="Capture moved to another window">
-    For `Phase.SUPERSEDED`, tell the customer to continue in the other window. Avoid automatically restarting both windows.
-  </Accordion>
+## Scanner startup fails
 
-  <Accordion title="The scanner does not load">
-    Confirm that `/bouncr/index.js` and the accompanying SDK assets are available from your deployed page. Check browser console and network errors for blocked scripts, workers, or missing files. If you use a Content Security Policy, permit the SDK’s scripts, workers, and API connection.
+Verify that `/bouncr/index.js` and its accompanying assets are served together. The capture page requires HTTPS or localhost. Check deployed script, worker, and API requests against your Content Security Policy.
 
-    When contacting support, include the SDK version, scan ID if available, browser/device version, error code, and the step that failed. Keep document images and credentials out of ordinary logs.
-  </Accordion>
-</AccordionGroup>
+For support, include the SDK version, scan ID, browser/device version, error code, and failing step. The optional `onDiagnostics` callback provides timing data.

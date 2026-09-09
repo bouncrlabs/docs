@@ -1,48 +1,13 @@
 ---
-title: "Document capture"
-description: "Add identity document capture to your application."
+title: "IDV SDK"
+description: "Integrate document capture and identity verification."
 ---
 
-Let customers scan an ID or passport without leaving your application. Bouncr guides the capture, uploads the document, and makes verification results available to your backend.
+`@bouncrlabs/idv` captures identity documents and submits them to Bouncr for verification.
 
-The Web SDK provides camera controls and capture events. You build the screens with your own components, styles, and copy.
+Create a scan on your backend, initialize the SDK with its capture token, and retrieve the scan after processing completes.
 
-<Card title="Build your first capture screen" icon="react" href="/external/web">
-  Follow the React quickstart to select a document, capture it, and retrieve your first result.
-</Card>
-
-## Build your integration
-
-<CardGroup cols={2}>
-  <Card title="Connect your backend" icon="server" href="/external/backend">
-    Authorize capture for your signed-in customers.
-  </Card>
-
-  <Card title="Customize capture" icon="palette" href="/external/customize">
-    Use your own components, instructions, and camera controls.
-  </Card>
-
-  <Card title="Handle results" icon="check" href="/external/results">
-    Read the verification decision and document details.
-  </Card>
-
-  <Card title="Resume a scan" icon="rotate-right" href="/external/resume">
-    Restore accepted captures after a refresh.
-  </Card>
-
-  <Card title="Supported documents" icon="passport" href="/external/documents">
-    Choose the documents your integration accepts.
-  </Card>
-
-  <Card title="Troubleshooting" icon="life-ring" href="/external/recovery">
-    Help customers finish their capture.
-  </Card>
-</CardGroup>
-
-## A capture from start to finish
-
-Your customer chooses the issuing country and document, then opens the camera. Bouncr captures the required images automatically and processes the scan. Your backend retrieves the result and decides the next step in your application.
-
-Each scan has an ID. Save it alongside the customer’s application or onboarding record so you can retrieve the result later.
-
-For method signatures, options, and callbacks, see the [Web SDK reference](/external/reference).
+- [Quickstart](/external/web)
+- [Create a scan](/external/backend)
+- [SDK reference](/external/reference)
+- [API reference](/external/api-reference)

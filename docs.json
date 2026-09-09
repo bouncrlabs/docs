@@ -12,37 +12,27 @@
     "dark": "/images/svgviewer-output%20%281%29_transparent.svg"
   },
   "navigation": {
-    "pages": [
-      {
-        "group": "Getting Started",
-        "pages": [
-          "index",
-          "quickstart"
-        ]
-      }
-    ],
     "groups": [
       {
         "group": "Getting started",
         "pages": [
           "external/overview",
+          "external/backend",
           "external/web"
         ]
       },
       {
         "group": "Guides",
         "pages": [
-          "external/backend",
           "external/customize",
-          "external/results",
           "external/resume",
-          "external/recovery"
+          "external/recovery",
+          "external/results"
         ]
       },
       {
         "group": "Reference",
         "pages": [
-          "external/documents",
           "external/reference"
         ]
       },
@@ -51,9 +41,8 @@
         "pages": [
           "external/api-reference",
           "external/api/create-scan",
-          "external/api/authorize-capture",
+          "external/api/create-token",
           "external/api/get-scan",
-          "external/api/get-result",
           "external/api/list-scans"
         ]
       }
@@ -69,12 +58,7 @@
         "label": "Support",
         "href": "mailto:hello@bouncrlabs.com"
       }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://app.mintlify.com"
-    }
+    ]
   },
   "contextual": {
     "options": [
@@ -97,9 +81,21 @@
     "strict": true
   },
   "api": {
-    "openapi": "openapi.json",
+    "openapi": [
+      "openapi.json"
+    ],
+    "playground": {
+      "display": "interactive"
+    },
     "examples": {
-      "autogenerate": true
+      "autogenerate": true,
+      "languages": [
+        "curl",
+        "javascript",
+        "python"
+      ],
+      "defaults": "required",
+      "prefill": true
     }
   }
 }

@@ -1,66 +1,17 @@
 ---
-title: "HTTP API reference"
-description: "Create scans, authorize browser capture, and retrieve results from your backend."
+title: "Authentication"
+description: "Credentials and scopes for the Bouncr API."
 ---
 
-Use the Bouncr HTTP API from your backend to create scans in a venue, authorize a capture session, and retrieve results. Requests use `https://api.bouncr.io` with a scoped bearer credential.
+Use `https://api.bouncr.io` with an organization API credential in the `Authorization: Bearer …` header.
 
-<Info>
-  Keep your organization credential on your backend. Pass the scan’s initialization token and configuration through your existing onboarding response or page props.
-</Info>
-
-## Endpoints
-
-<Columns cols={2}>
-  <Card title="Create a scan" icon="plus" href="/external/api/create-scan">
-    Start a scan in an authorized venue.
-  </Card>
-
-  <Card title="Authorize capture" icon="key" href="/external/api/authorize-capture">
-    Issue an initialization token for the scan and registered origin.
-  </Card>
-
-  <Card title="Get scan status" icon="arrows-rotate" href="/external/api/get-scan">
-    Check accepted evidence and processing progress.
-  </Card>
-
-  <Card title="Get a result" icon="file-circle-check" href="/external/api/get-result">
-    Read the verification decision and purchased details.
-  </Card>
-
-  <Card title="List scans" icon="list" href="/external/api/list-scans">
-    Page through scans your credential can access.
-  </Card>
-</Columns>
-
-## Authentication
-
-Send your credential in the `Authorization` header:
-
-```http
-Authorization: Bearer YOUR_API_TOKEN
-```
-
-The endpoint reference lists its required scope. A scope grants an operation; your credential's organization and venue access determine which records it can act on. The same credential can serve multiple authorized venues. Resolve each scan’s venue from your backend application record, as shown in [Connect your backend](/external/backend).
-
-| Task | Scope |
+| Scope | Access |
 | --- | --- |
-| Create scans | `scans:create` |
-| Authorize capture | `scans:capture` |
-| Read scan status | `scans:read` |
-| Read verification results | `scans:results:read` |
-| List scans | `scans:list` |
+| `scans:create` | Create scans in authorized venues. |
+| `scans:capture` | Include capture initialization when creating a scan, or issue a new capture token. |
+| `scans:read` | Retrieve a scan and its available results. |
+| `scans:list` | List scans in authorized venues. |
 
-## Response handling
+Organization credentials stay on your backend. Pass the scan’s capture token and configuration to the SDK.
 
-Treat scan and venue IDs as strings. Error responses use HTTP status codes; your client should handle empty response bodies before attempting to parse JSON.
-
-<Columns cols={2}>
-  <Card title="Connect your backend" icon="server" href="/external/backend">
-    Add capture initialization to your onboarding flow.
-  </Card>
-
-  <Card title="Handle results" icon="check" href="/external/results">
-    Use processing state and verification decisions in your application.
-  </Card>
-</Columns>
+Scan and venue IDs are strings. Error responses may have no body.

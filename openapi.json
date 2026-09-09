@@ -1,0 +1,1004 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Bouncr HTTP API",
+    "version": "1.0.0",
+    "description": "Create venue-scoped document scans and retrieve their authorized results. Keep API credentials on your backend."
+  },
+  "servers": [
+    {
+      "url": "https://api.bouncr.io",
+      "description": "Bouncr API"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Scans",
+      "description": "Document capture and verification scans."
+    }
+  ],
+  "paths": {
+    "/v1/scans": {
+      "post": {
+        "operationId": "create_scan",
+        "summary": "Create a scan",
+        "description": "Create a scan using the venue\u2019s document policy. Include scans:capture to receive SDK initialization data in the same response.\n\nRequired scope: `scans:create`.",
+        "tags": [
+          "Scans"
+        ],
+        "responses": {
+          "201": {
+            "description": "Create a scan successful.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedScan"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid, or expired bearer credential. Empty response body."
+          },
+          "403": {
+            "description": "Required scope, venue access, or scan admission is unavailable. Empty response body."
+          },
+          "404": {
+            "description": "Resource unavailable to this credential. Empty response body."
+          },
+          "422": {
+            "description": "Invalid or missing request field. Empty response body."
+          }
+        },
+        "x-mint": {
+          "metadata": {
+            "title": "Create a scan"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "venue_id": {
+                    "$ref": "#/components/schemas/ScanId"
+                  },
+                  "country": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{2}$",
+                    "description": "Optional ISO alpha-2 issuing country. Omit to select through the SDK.",
+                    "example": "US"
+                  },
+                  "document_type": {
+                    "type": "integer",
+                    "description": "Optional document type from the venue\u2019s allowed document policy. Requires country.",
+                    "example": 2
+                  }
+                },
+                "required": [
+                  "venue_id"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "list_scans",
+        "summary": "List scans",
+        "description": "List accessible scans in descending ID order. Returns up to 50 records. Pass the last ID as before to fetch the next page.\n\nRequired scope: `scans:list`.",
+        "tags": [
+          "Scans"
+        ],
+        "responses": {
+          "200": {
+            "description": "List scans successful.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScanSummary"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid, or expired bearer credential. Empty response body."
+          },
+          "403": {
+            "description": "Required scope, venue access, or scan admission is unavailable. Empty response body."
+          },
+          "404": {
+            "description": "Resource unavailable to this credential. Empty response body."
+          },
+          "422": {
+            "description": "Invalid or missing request field. Empty response body."
+          }
+        },
+        "x-mint": {
+          "metadata": {
+            "title": "List scans"
+          }
+        },
+        "parameters": [
+          {
+            "name": "before",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ScanId"
+            },
+            "description": "Return scans older than this ID."
+          }
+        ]
+      }
+    },
+    "/v1/scans/{scan_id}": {
+      "get": {
+        "operationId": "get_scan",
+        "summary": "Retrieve a scan",
+        "description": "Retrieve progress and available results. Verification and check details depend on the corresponding checks on the scan. Pending results are omitted.\n\nRequired scope: `scans:read`.",
+        "tags": [
+          "Scans"
+        ],
+        "responses": {
+          "200": {
+            "description": "Scan and available results.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Scan"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid, or expired bearer credential. Empty response body."
+          },
+          "403": {
+            "description": "Required scope, venue access, or scan admission is unavailable. Empty response body."
+          },
+          "404": {
+            "description": "Resource unavailable to this credential. Empty response body."
+          },
+          "422": {
+            "description": "Invalid or missing request field. Empty response body."
+          }
+        },
+        "x-mint": {
+          "metadata": {
+            "title": "Retrieve a scan"
+          }
+        },
+        "parameters": [
+          {
+            "name": "scan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ScanId"
+            },
+            "description": "ID of the scan your backend created."
+          }
+        ]
+      }
+    },
+    "/v1/scans/{scan_id}/tokens": {
+      "post": {
+        "operationId": "create_capture_token",
+        "summary": "Create a capture token",
+        "description": "Initialize or resume capture for an existing scan. Pass token and configuration to createCapture.\n\nRequired scope: `scans:capture`.",
+        "tags": [
+          "Scans"
+        ],
+        "responses": {
+          "401": {
+            "description": "Missing, invalid, or expired bearer credential. Empty response body."
+          },
+          "403": {
+            "description": "Required scope, venue access, or scan admission is unavailable. Empty response body."
+          },
+          "404": {
+            "description": "Resource unavailable to this credential. Empty response body."
+          },
+          "422": {
+            "description": "Invalid or missing request field. Empty response body."
+          },
+          "201": {
+            "description": "Capture initialization data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureInitialization"
+                }
+              }
+            }
+          }
+        },
+        "x-mint": {
+          "metadata": {
+            "title": "Create a capture token"
+          }
+        },
+        "parameters": [
+          {
+            "name": "scan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ScanId"
+            },
+            "description": "ID of the scan your backend created."
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Scoped organization API access token. Keep it on your backend."
+      }
+    },
+    "schemas": {
+      "ScanId": {
+        "type": "string",
+        "description": "Scan or venue identifier.",
+        "pattern": "^[0-9]+$",
+        "example": "128000000000000001"
+      },
+      "CreatedScan": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ScanId"
+          },
+          "capture": {
+            "$ref": "#/components/schemas/CaptureInitialization",
+            "description": "Included when the credential has scans:capture."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "ScanSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ScanId"
+          },
+          "venue_id": {
+            "$ref": "#/components/schemas/ScanId"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "venue_id",
+          "created_at"
+        ]
+      },
+      "Verification": {
+        "type": "object",
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "DECISION_UNSPECIFIED",
+              "DECISION_ACCEPT",
+              "DECISION_REJECT",
+              "DECISION_VERIFY"
+            ],
+            "description": "Verification decision under the venue\u2019s policy."
+          },
+          "integrity": {
+            "type": "string",
+            "enum": [
+              "INTEGRITY_UNSPECIFIED",
+              "INTEGRITY_FAKE",
+              "INTEGRITY_POSSIBLY_FAKE",
+              "INTEGRITY_REAL",
+              "INTEGRITY_VERIFIED_REAL",
+              "INTEGRITY_VERIFIED_FAKE"
+            ],
+            "description": "Document integrity assessment."
+          },
+          "of_age": {
+            "type": "boolean",
+            "description": "True indicates a positive age check. False can also mean no positive result is available."
+          },
+          "not_expired": {
+            "type": "boolean",
+            "description": "True indicates a positive expiration check. False can also mean no positive result is available."
+          }
+        },
+        "required": [
+          "decision",
+          "integrity",
+          "of_age",
+          "not_expired"
+        ]
+      },
+      "Document": {
+        "type": "object",
+        "properties": {
+          "document_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "document_type": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Document classification as a named value, such as drivers_license or passport_book."
+          },
+          "full_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "given_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "middle_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "surname": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "date_of_birth": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "sex": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "eye_color": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "nationality": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "issuing_authority": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "issuing_country": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "issuing_jurisdiction": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "expiration_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "issue_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "address_line_one": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "address_line_two": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "city": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state_province_county": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "postal_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "height_in": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "weight_lb": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        }
+      },
+      "Dmv": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "dldv_request_status_unspecified",
+              "pending",
+              "completed",
+              "unknown_error",
+              "balance_exhausted",
+              "invalid_document",
+              "jurisdiction_blocked",
+              "scan_unprocessed",
+              "failed",
+              "not_entitled"
+            ]
+          },
+          "details": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "description": "DMV check details, when available and included for the scan."
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "CaptureInitialization": {
+        "type": "object",
+        "required": [
+          "token",
+          "expires_at",
+          "configuration"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Pass to createCapture as token."
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "configuration": {
+            "type": "string",
+            "description": "Pass unchanged to createCapture as configuration."
+          }
+        }
+      },
+      "Scan": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ScanId"
+          },
+          "venue_id": {
+            "$ref": "#/components/schemas/ScanId"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "phase": {
+            "type": "integer",
+            "enum": [
+              10,
+              9,
+              2,
+              4,
+              5
+            ],
+            "description": "10: country selection; 9: document selection; 2: capture; 4: processing; 5: complete."
+          },
+          "verification": {
+            "$ref": "#/components/schemas/Verification"
+          },
+          "document": {
+            "$ref": "#/components/schemas/Document"
+          },
+          "dmv": {
+            "$ref": "#/components/schemas/Dmv"
+          },
+          "lists": {
+            "type": "array",
+            "description": "Matching Lists entries available to this credential.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "KIND_UNSPECIFIED",
+                    "KIND_BANNED",
+                    "KIND_VIP"
+                  ]
+                },
+                "notes": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "status",
+                "notes"
+              ]
+            }
+          },
+          "identity": {
+            "$ref": "#/components/schemas/Identity"
+          }
+        },
+        "required": [
+          "id",
+          "venue_id",
+          "created_at",
+          "phase"
+        ]
+      },
+      "Identity": {
+        "type": "object",
+        "description": "Identity details available from the scan\u2019s enabled checks.",
+        "properties": {
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "full_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "given_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "middle_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "surname": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "full_name",
+                "given_name",
+                "middle_name",
+                "surname"
+              ]
+            }
+          },
+          "addresses": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "address_line_one": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "address_line_two": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "city": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "state_province_county": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "postal_code": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "country": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "address_line_one",
+                "address_line_two",
+                "city",
+                "state_province_county",
+                "postal_code",
+                "country"
+              ]
+            }
+          },
+          "contacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "value": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "value"
+              ]
+            }
+          },
+          "demographics": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "value_date": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date"
+                },
+                "value_int": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "value_text": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "value_date",
+                "value_int",
+                "value_text"
+              ]
+            }
+          },
+          "educations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "school_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "grade_highest": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "degrees": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "majors": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "minors": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "gpa": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "started_on": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date"
+                },
+                "ended_on": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date"
+                },
+                "summary": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "school_name",
+                "grade_highest",
+                "degrees",
+                "majors",
+                "minors",
+                "gpa",
+                "started_on",
+                "ended_on",
+                "summary"
+              ]
+            }
+          },
+          "employments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "employer_name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "employer_linkedin_url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "employer_website": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "employer_type": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "employer_size": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "role_title": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "role_category": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "role_levels": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "employer_address_line_one": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "employer_address_line_two": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "employer_city": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "employer_state_province_county": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "employer_postal_code": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "employer_country": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "started_on": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date"
+                },
+                "ended_on": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date"
+                },
+                "summary": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "employer_name",
+                "employer_linkedin_url",
+                "employer_website",
+                "employer_type",
+                "employer_size",
+                "role_title",
+                "role_category",
+                "role_levels",
+                "employer_address_line_one",
+                "employer_address_line_two",
+                "employer_city",
+                "employer_state_province_county",
+                "employer_postal_code",
+                "employer_country",
+                "started_on",
+                "ended_on",
+                "summary"
+              ]
+            }
+          }
+        },
+        "required": [
+          "aliases",
+          "addresses",
+          "contacts",
+          "demographics",
+          "educations",
+          "employments"
+        ]
+      }
+    }
+  }
+}

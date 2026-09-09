@@ -1,133 +1,33 @@
 ---
-title: "Connect your backend"
-description: "Create a scan and authorize your customer to capture a document."
+title: "Create a scan"
+description: "Initialize capture from your backend."
 ---
 
-Include capture initialization data in your existing authenticated onboarding response or page props. Your backend creates the scan and gives the customer access to capture it.
-
-## Configure your credentials
-
-<Note>
-  Keep API credentials on your backend. The React app receives only the authorization needed for its capture.
-</Note>
-
-Keep these values in your backend environment:
-
-```bash
-BOUNCR_API_URL=https://api.bouncr.io
-BOUNCR_API_TOKEN=your_api_access_token
-BOUNCR_CAPTURE_ORIGIN=https://app.example.com
-```
-
-Use the API environment supplied for your integration. Register the exact origin that serves your capture page, including the port for local development.
-
-Your API credential needs `scans:create` and `scans:capture`. Add `scans:results:read` when this backend also retrieves results. One organization credential can serve multiple venues that it has permission to access; each scan uses the selected venue’s capture settings.
-
-## Create a scan
-
-Choose the venue from the customer’s authorized application record, then send its Bouncr venue ID to create the scan. In this standalone request, `VENUE_ID` is that resolved ID:
-
-```bash
-curl "$BOUNCR_API_URL/v1/scans" \
-  -H "Authorization: Bearer $BOUNCR_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d "{\"venue_id\":\"$VENUE_ID\"}"
-```
-
-The API returns `201 Created` with the scan ID:
+[Create a scan](/external/api/create-scan) with a venue ID and a credential scoped to `scans:create` and `scans:capture`. The response includes the scan ID and its SDK initialization data:
 
 ```json
-{ "id": "128000000000000001" }
-```
-
-Store this ID on the customer’s application or onboarding record. Reuse it as the customer selects a document and completes capture.
-
-## Initialize the capture screen
-
-Request an initialization token for the scan and the registered origin that serves your capture page:
-
-```bash
-curl "$BOUNCR_API_URL/v1/scans/$SCAN_ID/capture-authorizations" \
-  -H "Authorization: Bearer $BOUNCR_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d "{\"origin\":\"$BOUNCR_CAPTURE_ORIGIN\"}"
-```
-
-The response contains `access_token`, `token_type`, and `expires_in`. The initialization token lasts up to 10 minutes; `expires_in` gives its remaining lifetime in seconds. Pass its `access_token` to the browser as `token`, alongside the encoded configuration for the scan.
-
-Install the supplied SDK package on your backend to use `@bouncr/capture/server`.
-
-### Add capture data to your onboarding response
-
-The following Express handler represents your existing onboarding endpoint. Place it after your authentication middleware, where `req.user` identifies the signed-in customer. It looks up the application belonging to that customer, reads its assigned Bouncr venue, and stores the scan on the same application.
-
-The example uses your existing Prisma client imported from `./db.js`. Adapt `onboardingApplication`, `customerId`, `bouncrVenueId`, and `bouncrScanId` to your application’s data model. Assign the Bouncr venue when your backend provisions or routes the application.
-
-```javascript
-import { encodeConfiguration } from '@bouncr/capture/server';
-import { db } from './db.js';
-
-const apiUrl = process.env.BOUNCR_API_URL;
-const apiToken = process.env.BOUNCR_API_TOKEN;
-const captureOrigin = process.env.BOUNCR_CAPTURE_ORIGIN;
-
-app.get('/api/onboarding/:applicationId', async (req, res, next) => {
-  try {
-    if (!req.user) return res.sendStatus(401);
-    const application = await db.onboardingApplication.findFirst({
-      where: { id: req.params.applicationId, customerId: req.user.id },
-    });
-    if (!application) return res.sendStatus(404);
-
-    const headers = {
-      Authorization: `Bearer ${apiToken}`,
-      'Content-Type': 'application/json',
-    };
-    let scanId = application.bouncrScanId;
-    if (!scanId) {
-      const created = await fetch(`${apiUrl}/v1/scans`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ venue_id: application.bouncrVenueId }),
-      });
-      if (!created.ok) return res.sendStatus(created.status);
-      scanId = (await created.json()).id;
-      await db.onboardingApplication.update({
-        where: { id: application.id },
-        data: { bouncrScanId: scanId },
-      });
-    }
-
-    const response = await fetch(`${apiUrl}/v1/scans/${scanId}/capture-authorizations`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ origin: captureOrigin }),
-    });
-    if (!response.ok) return res.sendStatus(response.status);
-
-    const { access_token } = await response.json();
-    res.set('Cache-Control', 'no-store').json({
-      capture: {
-        token: access_token,
-        configuration: encodeConfiguration(apiUrl, scanId),
-      },
-    });
-  } catch (error) {
-    next(error);
+{
+  "id": "124854268324842880",
+  "capture": {
+    "token": "<capture token>",
+    "expires_at": "2026-09-09T14:10:00Z",
+    "configuration": "<encoded configuration>"
   }
-});
+}
 ```
 
-Merge `capture` into your existing response alongside the rest of your onboarding data. Your React page loader passes it to `<App capture={data.capture} />`, as shown in the [React quickstart](/external/web). Server-rendered applications can supply the same object directly as page props.
+Save `id` with your application record and pass `capture.token` and `capture.configuration` to [`createCapture`](/external/web). Capture requests go directly to Bouncr.
 
-The application ID selects a record; the customer ownership check authorizes it. Derive the venue and existing scan from that record, rather than accepting either ID from the browser. Create it once, persist its ID before returning the page, and reuse it when the customer refreshes. If your onboarding endpoint can run concurrently, serialize initial scan creation through your existing application-record transaction or lock.
+The organization API credential is server-only. The capture token is intended for the SDK and is limited to one scan.
 
-## Refresh or resume
+## Country and document selection
 
-When the capture page reloads, issue a fresh initialization token for the existing scan and pass new props to the capture component. The SDK restores the accepted captures and requests the remaining document sides.
+Supply `country` and `document_type` when creating the scan if your application already has them. Otherwise, the SDK provides the available choices during initialization. The venue’s document policy determines which combinations are accepted.
 
-For a fresh application, create a fresh scan. Keep initialization responses out of caches and initialize the SDK while the token is valid.
+## Resume capture
 
-## Next step
+[Create a capture token](/external/api/create-token) for the existing scan and initialize the SDK with the response. Accepted captures are restored. See [Resume capture](/external/resume).
 
-Continue with the [React quickstart](/external/web) to build your capture page.
+## Retrieve the result
+
+[Retrieve the scan](/external/api/get-scan) with `scans:read` to receive progress and available verification results in the same response.
