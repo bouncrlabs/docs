@@ -77,9 +77,7 @@
                     "example": "US"
                   },
                   "document_type": {
-                    "type": "integer",
-                    "description": "Optional document type from the venue\u2019s allowed document policy. Requires country.",
-                    "example": 2
+                    "$ref": "#/components/schemas/DocumentType"
                   }
                 },
                 "required": [
@@ -93,7 +91,7 @@
       "get": {
         "operationId": "list_scans",
         "summary": "List scans",
-        "description": "List accessible scans in descending ID order. Returns up to 50 records. Pass the last ID as before to fetch the next page.\n\nRequired scope: `scans:list`.",
+        "description": "List accessible scans from newest to oldest. Follow `pagination.after` for the next page or `pagination.before` for the previous page. A null cursor marks the end.\n\nRequired scope: `scans:list`.",
         "tags": [
           "Scans"
         ],
@@ -103,10 +101,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ScanSummary"
-                  }
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ScanSummary"
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "before": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "after": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "before",
+                        "after"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "pagination"
+                  ]
                 }
               }
             }
@@ -131,13 +159,30 @@
         },
         "parameters": [
           {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Opaque next-page cursor returned in pagination. Supply only one cursor."
+          },
+          {
             "name": "before",
             "in": "query",
-            "required": false,
             "schema": {
-              "$ref": "#/components/schemas/ScanId"
+              "type": "string"
             },
-            "description": "Return scans older than this ID."
+            "description": "Opaque previous-page cursor returned in pagination. Supply only one cursor."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
           }
         ]
       }
@@ -344,11 +389,7 @@
             ]
           },
           "document_type": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Document classification as a named value, such as drivers_license or passport_book."
+            "$ref": "#/components/schemas/DocumentType"
           },
           "full_name": {
             "type": [
@@ -481,37 +522,6 @@
           }
         }
       },
-      "Dmv": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "enum": [
-              "dldv_request_status_unspecified",
-              "pending",
-              "completed",
-              "unknown_error",
-              "balance_exhausted",
-              "invalid_document",
-              "jurisdiction_blocked",
-              "scan_unprocessed",
-              "failed",
-              "not_entitled"
-            ]
-          },
-          "details": {
-            "type": [
-              "object",
-              "null"
-            ],
-            "additionalProperties": true,
-            "description": "DMV check details, when available and included for the scan."
-          }
-        },
-        "required": [
-          "status"
-        ]
-      },
       "CaptureInitialization": {
         "type": "object",
         "required": [
@@ -548,24 +558,20 @@
             "format": "date-time"
           },
           "phase": {
-            "type": "integer",
+            "type": "string",
             "enum": [
-              10,
-              9,
-              2,
-              4,
-              5
-            ],
-            "description": "10: country selection; 9: document selection; 2: capture; 4: processing; 5: complete."
+              "PHASE_SELECTING_COUNTRY",
+              "PHASE_SELECTING_DOCUMENT",
+              "PHASE_CAPTURING",
+              "PHASE_PROCESSING",
+              "PHASE_COMPLETE"
+            ]
           },
           "verification": {
             "$ref": "#/components/schemas/Verification"
           },
           "document": {
             "$ref": "#/components/schemas/Document"
-          },
-          "dmv": {
-            "$ref": "#/components/schemas/Dmv"
           },
           "lists": {
             "type": "array",
@@ -793,12 +799,6 @@
                     "null"
                   ]
                 },
-                "grade_highest": {
-                  "type": [
-                    "integer",
-                    "null"
-                  ]
-                },
                 "degrees": {
                   "type": "array",
                   "items": {
@@ -847,7 +847,6 @@
               "required": [
                 "kind",
                 "school_name",
-                "grade_highest",
                 "degrees",
                 "majors",
                 "minors",
@@ -863,90 +862,6 @@
             "items": {
               "type": "object",
               "properties": {
-                "employer_name": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "employer_linkedin_url": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "employer_website": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "employer_type": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "employer_size": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "role_title": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "role_category": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "role_levels": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "employer_address_line_one": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "employer_address_line_two": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "employer_city": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "employer_state_province_county": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "employer_postal_code": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "employer_country": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
                 "started_on": {
                   "type": [
                     "string",
@@ -966,26 +881,126 @@
                     "string",
                     "null"
                   ]
+                },
+                "employer": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "linkedin_url": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "website": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "type": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "size": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "address_line_one": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "address_line_two": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "city": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "state_province_county": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "postal_code": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "country": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "linkedin_url",
+                    "website",
+                    "type",
+                    "size",
+                    "address_line_one",
+                    "address_line_two",
+                    "city",
+                    "state_province_county",
+                    "postal_code",
+                    "country"
+                  ]
+                },
+                "role": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "category": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "levels": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "category",
+                    "levels"
+                  ]
                 }
               },
               "required": [
-                "employer_name",
-                "employer_linkedin_url",
-                "employer_website",
-                "employer_type",
-                "employer_size",
-                "role_title",
-                "role_category",
-                "role_levels",
-                "employer_address_line_one",
-                "employer_address_line_two",
-                "employer_city",
-                "employer_state_province_county",
-                "employer_postal_code",
-                "employer_country",
                 "started_on",
                 "ended_on",
-                "summary"
+                "summary",
+                "employer",
+                "role"
               ]
             }
           }
@@ -997,6 +1012,25 @@
           "demographics",
           "educations",
           "employments"
+        ]
+      },
+      "DocumentType": {
+        "type": "string",
+        "enum": [
+          "TYPE_UNSPECIFIED",
+          "TYPE_UNKNOWN",
+          "TYPE_DRIVERS_LICENSE",
+          "TYPE_ENHANCED_DRIVERS_LICENSE",
+          "TYPE_STATE_ID",
+          "TYPE_PASSPORT_BOOK",
+          "TYPE_PASSPORT_CARD",
+          "TYPE_PERMANENT_RESIDENT_CARD",
+          "TYPE_EMPLOYMENT_AUTHORIZATION_CARD",
+          "TYPE_GLOBAL_ENTRY_CARD",
+          "TYPE_MILITARY_ID",
+          "TYPE_VISA",
+          "TYPE_OTHER_TRAVEL_DOCUMENT",
+          "TYPE_MOBILE_DOCUMENT"
         ]
       }
     }
