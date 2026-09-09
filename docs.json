@@ -8,8 +8,8 @@
     "dark": "#e2503f"
   },
   "favicon": {
-    "light": "/images/svgviewer-output%20%281%29_transparent.svg",
-    "dark": "/images/svgviewer-output%20%281%29_transparent.svg"
+    "light": "/images/bouncr-logo-light.svg",
+    "dark": "/images/bouncr-logo-dark.svg"
   },
   "navigation": {
     "groups": [
@@ -49,8 +49,8 @@
     ]
   },
   "logo": {
-    "light": "/images/vectorized_019d164c-78ce-7a43-83dd-5c205bf6fb04_transparent.svg",
-    "dark": "/images/vectorized_019d164c-78ce-7a43-83dd-5c205bf6fb04_transparent.svg"
+    "light": "/images/bouncr-word-mark-light.svg",
+    "dark": "/images/bouncr-word-mark-dark.svg"
   },
   "navbar": {
     "links": [
@@ -65,20 +65,18 @@
       "copy",
       "view",
       "chatgpt",
-      "claude",
-      "perplexity",
-      "mcp",
-      "cursor",
-      "vscode"
+      "claude"
     ]
   },
   "footer": {
     "socials": {
-      "linkedin": "https://linkedin.com/company/bouncr-labs"
+      "linkedin": "https://linkedin.com/company/bouncr-labs",
+      "github": "https://github.com/bouncrlabs",
+      "website": "https://bouncrlabs.com"
     }
   },
   "appearance": {
-    "strict": true
+    "strict": false
   },
   "api": {
     "openapi": [
@@ -97,5 +95,6 @@
       "defaults": "required",
       "prefill": true
     }
-  }
+  },
+  "description": "Build real-time ID verification into your product with Bouncr Labs SDKs"
 }
