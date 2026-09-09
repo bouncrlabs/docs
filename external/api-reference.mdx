@@ -3,7 +3,7 @@ title: "Authentication"
 description: "Credentials and scopes for the Bouncr API."
 ---
 
-Use `https://api.bouncr.io` with an organization API credential in the `Authorization: Bearer …` header.
+Base URL: `https://api.bouncr.io`.
 
 | Scope | Access |
 | --- | --- |
@@ -12,6 +12,10 @@ Use `https://api.bouncr.io` with an organization API credential in the `Authoriz
 | `scans:read` | Retrieve a scan and its available results. |
 | `scans:list` | List scans in authorized venues. |
 
-Organization credentials stay on your backend. Pass the scan’s capture token and configuration to the SDK.
+| Credential | Use | Sensitive |
+| --- | --- | --- |
+| Organization API credential | Server-side API access within its scopes. | Yes; server-only. |
+| Capture token | SDK access to one scan. | Scan-scoped; supplied to the client. |
+| npm download token | Install `@bouncrlabs/idv`. | Yes; build environment only. |
 
 Scan and venue IDs are strings. Error responses may have no body.

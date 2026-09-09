@@ -12,7 +12,7 @@ Retrieve results through [GET /v1/scans/{scan_id}](/external/api/get-scan) with 
 | `onCaptureComplete(scanId)` | All required captures have been accepted. |
 | `onComplete(scanId)` | Processing has finished. |
 
-`onComplete` signals processing completion, not an accepted verification decision. Use it to trigger result retrieval on your backend.
+`onComplete` signals processing completion, not an accepted verification decision.
 
 ## Verification
 
@@ -32,7 +32,10 @@ Retrieve results through [GET /v1/scans/{scan_id}](/external/api/get-scan) with 
 | `INTEGRITY_VERIFIED_FAKE` | Additional verification contradicted the document details. |
 | `INTEGRITY_UNSPECIFIED` | No assessment available. |
 
-`of_age` and `not_expired` report positive age and expiration checks. A `false` value does not distinguish a failed check from an unavailable check.
+| Field | `true` | `false` | `null` |
+| --- | --- | --- | --- |
+| `of_age` | Meets the venue’s minimum age. | Below the venue’s minimum age. | No result available. |
+| `not_expired` | Document is not expired. | Document is expired. | No result available. |
 
 ## Additional checks
 

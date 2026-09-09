@@ -1,43 +1,26 @@
 ---
 title: "Errors"
-description: "Handle capture errors and help customers complete their scan."
+description: "Error reporting and capture recovery."
 ---
 
-Handle initialization errors by catching the `createCapture()` promise. After initialization, failures appear in `onState` with `Phase.FAILED` and `state.error`.
+`createCapture()` rejects if initialization fails. After initialization, capture failures appear in `onState` with `Phase.FAILED` and `state.error`.
 
-## Recovery actions
-
-| Error | Meaning | Action |
-| --- | --- | --- |
-| `COUNTRY_MISMATCH` | The captured document’s issuer differs from the selection. | Ask the customer to correct the issuing country. |
-| `DOCUMENT_TYPE_MISMATCH` | The captured document differs from the selected type. | Reopen document selection. |
-| `CAMERA_PERMISSION_DENIED` | The browser has not granted camera access. | Ask the customer to enable permission, then retry. |
-| `CAMERA_UNAVAILABLE` | The requested camera cannot be opened. | Ask the customer to close another camera app or choose another device. |
-| `UNAUTHORIZED` | Capture credentials are no longer accepted. | Obtain fresh initialization data for the same scan and recreate the instance. |
-| `ACCESS_DENIED` | The integration is not permitted to perform the operation. | Check credential scopes, venue access, and capture admission. |
-| `NOT_FOUND` | The scan is missing or inaccessible. | Check the scan associated with this application on your backend. |
-| `NETWORK_ERROR` | A request could not reach Bouncr. | Let automatic recovery run; offer [resume](/external/resume) if capture fails. |
-| `INVALID_AUTHORIZATION` | Initialization token or configuration is invalid. | Check that both values belong to the same scan and environment. |
-| `CAPTURE_FAILED` | Capture could not continue. | Offer a retry; record the scan ID and device/browser version for support. |
-
-Other error codes identify invalid requests, responses, or evidence. Keep them for diagnostics and show a retry/support action rather than exposing the raw code to the customer.
+The [ErrorCode reference](/external/reference#errorcode) lists every code.
 
 ## Correct a selection
 
-Before the first capture is accepted, reopen country or document selection:
+Before the first capture is accepted, update the country or document type:
 
 ```typescript
 capture.update({ country: correctedCountry, documentType: correctedDocumentType });
 ```
 
-After a capture has been accepted, changing documents requires a new scan. Use `state.resumable` to distinguish these cases.
+After a capture has been accepted, changing documents requires a new scan. `state.resumable` indicates accepted captures.
 
-## Capture moved to another window
+## Resume after failure
 
-`Phase.SUPERSEDED` means another instance took over. Direct the customer there instead of repeatedly restarting this instance. See [Resume a scan](/external/resume#another-active-window).
+`start()` resumes a failed or stopped instance. Expired or rejected credentials require a fresh [capture token](/external/api/create-token) and a new SDK instance for the same scan. See [Resume a scan](/external/resume).
 
-## Scanner startup fails
+## Browser requirements
 
-The capture page requires HTTPS or localhost. Allow `https://cdn.bouncr.io` in script and connection policy, `blob:` for workers, and WebAssembly compilation. Check failed runtime or API requests in the browser network panel.
-
-For support, include the SDK version, scan ID, browser/device version, error code, and failing step. The optional `onDiagnostics` callback provides timing data.
+Capture requires HTTPS or localhost. Content Security Policy must allow `https://cdn.bouncr.io` for scripts and connections, `blob:` workers, and WebAssembly compilation.

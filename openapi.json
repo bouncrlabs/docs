@@ -3,7 +3,7 @@
   "info": {
     "title": "Bouncr HTTP API",
     "version": "1.0.0",
-    "description": "Create venue-scoped document scans and retrieve their authorized results. Keep API credentials on your backend."
+    "description": "Create venue-scoped document scans and retrieve verification results."
   },
   "servers": [
     {
@@ -293,7 +293,7 @@
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
-        "description": "Scoped organization API access token. Keep it on your backend."
+        "description": "Scoped organization API access token."
       }
     },
     "schemas": {
@@ -364,12 +364,18 @@
             "description": "Document integrity assessment."
           },
           "of_age": {
-            "type": "boolean",
-            "description": "True indicates a positive age check. False can also mean no positive result is available."
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Whether the minimum-age check has passed. Null when no result is available."
           },
           "not_expired": {
-            "type": "boolean",
-            "description": "True indicates a positive expiration check. False can also mean no positive result is available."
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Whether the document-expiration check has passed. Null when no result is available."
           }
         },
         "required": [

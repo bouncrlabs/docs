@@ -18,8 +18,4 @@ Initialize a new SDK instance with the fresh token and the same scan’s configu
 
 Call `stop()` to cancel capture and release the camera. Call `start()` to continue using the same instance. Call `destroy()` when leaving the capture page; a destroyed instance cannot restart.
 
-## Another active window
-
-`Phase.SUPERSEDED` means another instance has taken over the scan. Direct the customer to continue there. If you offer **Continue here**, obtain fresh initialization data and create a new instance after the customer chooses it.
-
-To submit a different document after evidence has been accepted, create a new scan. See [Troubleshooting](/external/recovery) for correcting a selection before that point.
+To submit a different document after evidence has been accepted, create a new scan. See [Errors](/external/recovery) for correcting a selection before that point.

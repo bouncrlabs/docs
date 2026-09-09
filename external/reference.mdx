@@ -31,7 +31,6 @@ Analysis ceiling, from 1 to 30. Actual analysis rate adapts to device performanc
 | `onComplete` | `(scanId: string) => void` | Processing finished. |
 | `onTorchChange` | `(state: TorchState) => void` | Flashlight availability or enabled state changed. |
 | `onJobStatus` | `(status: SubscribeJobStatusResponse) => void` | Processing job updated. |
-| `onDiagnostics` | `(data: CaptureDiagnostics) => void` | Timing and geometry diagnostics available. |
 
 ## Methods
 
@@ -49,7 +48,7 @@ Analysis ceiling, from 1 to 30. Actual analysis rate adapts to device performanc
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `phase` | `Phase` | Lifecycle state, listed below. |
+| `phase` | `Phase` | Capture lifecycle state. |
 | `guidance` | `Guidance` | Capture feedback. |
 | `scanId` | `string?` | Scan identifier. |
 | `resumable` | `boolean` | Accepted captures are available to restore. |
@@ -57,7 +56,7 @@ Analysis ceiling, from 1 to 30. Actual analysis rate adapts to device performanc
 | `country` | `string` | Selected ISO alpha-2 country; empty before selection. |
 | `allowedDocumentTypes` | `DocumentType[]` | Available types for the selected country. |
 | `documentType` | `DocumentType` | Selected type. |
-| `side` | `Side` | Requested side: `FRONT`, `REAR`, or `UNSPECIFIED`. |
+| `side` | `Side` | Requested capture side. |
 | `givenName` | `string` | Given name after capture; empty when unavailable. |
 | `error` | `{ code: ErrorCode; status: number }?` | Capture failure. |
 
@@ -67,6 +66,7 @@ Selection arrays are empty once capture has been accepted.
 
 | Value | State |
 | --- | --- |
+| `UNSPECIFIED` | No lifecycle state assigned. |
 | `AUTHORIZING` | Initializing the scan. |
 | `SELECTING_COUNTRY` | Awaiting country selection. |
 | `SELECTING_DOCUMENT` | Awaiting document selection. |
@@ -80,11 +80,89 @@ Selection arrays are empty once capture has been accepted.
 | `SUPERSEDED` | Another instance took over the scan. |
 | `STOPPED` | Capture stopped. |
 
-### TorchState
+### Guidance
+
+| Value | Meaning |
+| --- | --- |
+| `UNSPECIFIED` | No guidance available. |
+| `ALIGN_DOCUMENT` | Document alignment or framing is insufficient. |
+| `HOLD_STILL` | Document is readable; capture is stabilizing. |
+| `FLIP_DOCUMENT` | The visible side has already been captured. |
+| `REDUCE_GLARE` | Glare obscures the document. |
+| `MOVE_CLOSER` | Document details are not readable at the current distance. |
+| `IMPROVE_FOCUS` | The image is insufficiently sharp. |
+| `CLEAR_BACKGROUND` | Document detection remains uncertain. |
+| `READING_DOCUMENT` | A manually captured image is being analyzed. |
+
+### Side
+
+| Value | Meaning |
+| --- | --- |
+| `UNSPECIFIED` | No capture side requested. |
+| `FRONT` | Photo side or document photo page. |
+| `REAR` | Reverse side. |
+
+### DocumentType
+
+| Value | Document |
+| --- | --- |
+| `UNSPECIFIED` | No document type selected. |
+| `UNKNOWN` | Unclassified document. |
+| `DRIVERS_LICENSE` | Driver’s license. |
+| `ENHANCED_DRIVERS_LICENSE` | Enhanced driver’s license. |
+| `STATE_ID` | State ID. |
+| `PASSPORT_BOOK` | Passport. |
+| `PASSPORT_CARD` | Passport card. |
+| `PERMANENT_RESIDENT_CARD` | Permanent resident card. |
+| `EMPLOYMENT_AUTHORIZATION_CARD` | Employment authorization card. |
+| `GLOBAL_ENTRY_CARD` | Global Entry card. |
+| `MILITARY_ID` | Military ID. |
+| `VISA` | Visa. |
+| `OTHER_TRAVEL_DOCUMENT` | Other travel document. |
+| `MOBILE_DOCUMENT` | Mobile document. |
+
+Available selections are returned in `allowedDocumentTypes`.
+
+### ErrorCode
+
+| Value | Meaning |
+| --- | --- |
+| `UNSPECIFIED` | No error code assigned. |
+| `ABORTED` | Operation canceled. |
+| `ACCESS_DENIED` | Operation is not permitted. |
+| `CALLBACK_FAILED` | An application callback failed. |
+| `CAMERA_PERMISSION_DENIED` | Camera permission was denied. |
+| `CAMERA_UNAVAILABLE` | The camera or a camera frame is unavailable. |
+| `CAPTURE_FAILED` | Capture could not complete. |
+| `COUNTRY_MISMATCH` | Document issuer differs from the selected country. |
+| `DOCUMENT_TYPE_MISMATCH` | Document differs from the selected type. |
+| `HTTPS_REQUIRED` | The capture environment is not a secure context. |
+| `IMAGE_ENCODING_FAILED` | The captured image could not be encoded. |
+| `INVALID_AUTHORIZATION` | Initialization credentials or configuration are invalid. |
+| `INVALID_AUTHORIZATION_RESPONSE` | Authorization returned an invalid response. |
+| `INVALID_CAPTURE_EVIDENCE` | Capture evidence is invalid. |
+| `INVALID_CAPTURE_SNAPSHOT` | Capture state is invalid or inconsistent. |
+| `INVALID_ENDPOINT` | The API endpoint is invalid. |
+| `INVALID_EVIDENCE` | The server rejected the submitted evidence. |
+| `INVALID_JOB_STATUS` | A processing status update is invalid. |
+| `INVALID_REQUEST` | Request or operation arguments are invalid. |
+| `INVALID_RESPONSE` | A response is invalid. |
+| `INVALID_STATUS_STREAM` | The status stream is invalid. |
+| `KEY_GENERATION_FAILED` | Capture key generation failed. |
+| `NETWORK_ERROR` | A network request failed. |
+| `NOT_FOUND` | The requested resource is missing or inaccessible. |
+| `REQUEST_FAILED` | The server rejected the request. |
+| `RESPONSE_TOO_LARGE` | A response exceeded the size limit. |
+| `SIGNING_FAILED` | Capture signing failed. |
+| `STATUS_STREAM_TOO_LARGE` | The status stream exceeded the size limit. |
+| `SUPERSEDED` | See `Phase.SUPERSEDED`. |
+| `UNAUTHORIZED` | Credentials were rejected. |
+
+## TorchState
 
 | Field | Type |
 | --- | --- |
 | `available` | `boolean` |
 | `enabled` | `boolean` |
 
-See [Errors](/external/recovery) for recovery and [Results](/external/results) for verification decisions.
+See [Errors](/external/recovery) for error handling and [Results](/external/results) for verification decisions.
