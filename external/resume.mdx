@@ -5,7 +5,7 @@ description: "Restore accepted captures when a customer returns to your flow."
 
 Save the scan ID with your application record. When the customer returns, reuse that scan and request a fresh [initialization token](/external/api/create-token).
 
-Initialize a new SDK instance with the fresh token and the same scan’s configuration, The SDK restores the scan’s state. Call `start()` when it enters `Phase.READY` to capture any remaining side.
+Initialize a new SDK instance with the fresh token and the same scan’s configuration. The SDK restores the scan’s state. Call `start()` when it enters `Phase.READY` to capture any remaining side.
 
 | Saved progress | What happens on resume |
 | --- | --- |
