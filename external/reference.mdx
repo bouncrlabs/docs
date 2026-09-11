@@ -53,7 +53,7 @@ Receives lifecycle, selection, guidance, and error updates.
 | `allowedDocumentTypes` | `DocumentType[]` | Available types for the selected country. |
 | `documentType` | `DocumentType` | Selected type. |
 | `side` | `Side` | Requested capture side. |
-| `givenName` | `string` | Given name after capture; empty when unavailable. |
+| `reading` | `Reading` | What the selected document is read by: `BARCODE_2D` or `MRZ`. |
 | `error` | `{ code: ErrorCode; status: number }?` | Capture failure. |
 
 Selection arrays are empty once capture has been accepted.
