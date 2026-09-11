@@ -19,9 +19,6 @@ Configuration returned with the capture token. Pass unchanged.
 <ParamField body="onState" type="(state: CaptureState) => void" required>
 Receives lifecycle, selection, guidance, and error updates.
 </ParamField>
-<ParamField body="maxAnalysisFps" type="number" default="30">
-Analysis ceiling, from 1 to 30. Actual analysis rate adapts to device performance.
-</ParamField>
 
 ### Callbacks
 
@@ -42,7 +39,6 @@ Analysis ceiling, from 1 to 30. Actual analysis rate adapts to device performanc
 | `stop()` | `void` | Stops capture and releases the camera. |
 | `destroy()` | `void` | Releases the instance and its resources. |
 | `setTorch(enabled: boolean)` | `Promise<void>` | Sets the flashlight; rejects when unavailable. |
-| `setAnalysisFps(value: number)` | `void` | Updates the analysis ceiling; values outside 1–30 throw. |
 
 ## CaptureState
 
