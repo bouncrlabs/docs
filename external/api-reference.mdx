@@ -11,11 +11,12 @@ Base URL: `https://api.bouncr.io`.
 | `scans:capture` | Include capture initialization when creating a scan, or issue a new capture token. |
 | `scans:read` | Retrieve a scan and its available results. |
 | `scans:list` | List scans in authorized venues. |
+| `packages:read` | Download `@bouncrlabs/idv` from `registry.bouncrlabs.com`. |
 
 | Credential | Use | Sensitive |
 | --- | --- | --- |
 | Organization API credential | Server-side API access within its scopes. | Yes; server-only. |
 | Capture token | SDK access to one scan. | Scan-scoped; supplied to the client. |
-| npm download token | Install `@bouncrlabs/idv`. | Yes; build environment only. |
+| Package download credential | Organization credential scoped to `packages:read`. | Yes; build environment only. |
 
 Scan and venue IDs are strings. Error responses may have no body.
