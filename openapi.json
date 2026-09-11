@@ -27,7 +27,7 @@
       "post": {
         "operationId": "create_scan",
         "summary": "Create a scan",
-        "description": "Create a scan using the venue\u2019s document policy. Include scans:update to receive SDK initialization data in the same response.\n\nRequired scope: `scans:create`.",
+        "description": "Create a scan using the venue’s document policy. Include scans:update to receive SDK initialization data in the same response.\n\nRequired scope: `scans:create`.",
         "tags": [
           "Scans"
         ],
@@ -349,7 +349,7 @@
               "DECISION_REJECT",
               "DECISION_VERIFY"
             ],
-            "description": "Verification decision under the venue\u2019s policy."
+            "description": "Verification decision under the venue’s policy."
           },
           "integrity": {
             "type": "string",
@@ -619,53 +619,8 @@
       },
       "Identity": {
         "type": "object",
-        "description": "Identity details available from the scan\u2019s enabled checks.",
+        "description": "Identity details available from the scan’s enabled checks.",
         "properties": {
-          "aliases": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "kind": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "full_name": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "given_name": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "middle_name": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "surname": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "required": [
-                "kind",
-                "full_name",
-                "given_name",
-                "middle_name",
-                "surname"
-              ]
-            }
-          },
           "addresses": {
             "type": "array",
             "items": {
@@ -746,45 +701,6 @@
               "required": [
                 "kind",
                 "value"
-              ]
-            }
-          },
-          "demographics": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "kind": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "value_date": {
-                  "type": [
-                    "string",
-                    "null"
-                  ],
-                  "format": "date"
-                },
-                "value_int": {
-                  "type": [
-                    "integer",
-                    "null"
-                  ]
-                },
-                "value_text": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "required": [
-                "kind",
-                "value_date",
-                "value_int",
-                "value_text"
               ]
             }
           },
@@ -1012,10 +928,8 @@
           }
         },
         "required": [
-          "aliases",
           "addresses",
           "contacts",
-          "demographics",
           "educations",
           "employments"
         ]
