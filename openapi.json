@@ -27,7 +27,7 @@
       "post": {
         "operationId": "create_scan",
         "summary": "Create a scan",
-        "description": "Create a scan using the venue\u2019s document policy. Include scans:capture to receive SDK initialization data in the same response.\n\nRequired scope: `scans:create`.",
+        "description": "Create a scan using the venue\u2019s document policy. Include scans:update to receive SDK initialization data in the same response.\n\nRequired scope: `scans:create`.",
         "tags": [
           "Scans"
         ],
@@ -91,7 +91,7 @@
       "get": {
         "operationId": "list_scans",
         "summary": "List scans",
-        "description": "List accessible scans from newest to oldest. Follow `pagination.after` for the next page or `pagination.before` for the previous page. A null cursor marks the end.\n\nRequired scope: `scans:list`.",
+        "description": "List accessible scans from newest to oldest. Follow `pagination.after` for the next page or `pagination.before` for the previous page. A null cursor marks the end.\n\nRequired scope: `scans:read`.",
         "tags": [
           "Scans"
         ],
@@ -241,7 +241,7 @@
       "post": {
         "operationId": "create_capture_token",
         "summary": "Create a capture token",
-        "description": "Initialize or resume capture for an existing scan. Pass token and configuration to createCapture.\n\nRequired scope: `scans:capture`.",
+        "description": "Initialize or resume capture for an existing scan. Pass token and configuration to createCapture.\n\nRequired scope: `scans:update`.",
         "tags": [
           "Scans"
         ],
@@ -311,7 +311,7 @@
           },
           "capture": {
             "$ref": "#/components/schemas/CaptureInitialization",
-            "description": "Included when the credential has scans:capture."
+            "description": "Included when the credential has scans:update."
           }
         },
         "required": [
