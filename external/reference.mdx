@@ -35,7 +35,7 @@ Receives lifecycle, selection, guidance, and error updates.
 | --- | --- | --- |
 | `update({ country?, documentType? })` | `void` | Changes the selection before any capture is accepted. Country uses an ISO alpha-2 code; document type uses `DocumentType`. |
 | `start()` | `void` | Starts the camera from `READY`, or resumes a stopped capture. |
-| `capture()` | `void` | Requests manual capture during `CAPTURING`. |
+| `capture()` | `void` | Requests manual capture during `CAPTURING_FRONT` or `CAPTURING_REAR`. |
 | `stop()` | `void` | Stops capture and releases the camera. |
 | `destroy()` | `void` | Releases the instance and its resources. |
 | `setTorch(enabled: boolean)` | `Promise<void>` | Sets the flashlight; rejects when unavailable. |
@@ -46,17 +46,12 @@ Receives lifecycle, selection, guidance, and error updates.
 | --- | --- | --- |
 | `phase` | `Phase` | Capture lifecycle state. |
 | `guidance` | `Guidance` | Capture feedback. |
-| `scanId` | `string?` | Scan identifier. |
-| `resumable` | `boolean` | Accepted captures are available to restore. |
-| `countryCodes` | `string[]` | Available issuing countries. |
 | `country` | `string` | Selected ISO alpha-2 country; empty before selection. |
 | `allowedDocumentTypes` | `DocumentType[]` | Available types for the selected country. |
 | `documentType` | `DocumentType` | Selected type. |
-| `side` | `Side` | Requested capture side. |
-| `reading` | `Reading` | What the selected document is read by: `BARCODE_2D` or `MRZ`. |
+| `reading` | `Reading` | What still needs decoding on the current side: `BARCODE_2D`, `MRZ`, or `UNSPECIFIED` once a reading was accepted. |
 | `error` | `{ code: ErrorCode; status: number }?` | Capture failure. |
 
-Selection arrays are empty once capture has been accepted.
 
 ### Phase
 
@@ -68,7 +63,8 @@ Selection arrays are empty once capture has been accepted.
 | `SELECTING_DOCUMENT` | Awaiting document selection. |
 | `UPDATING` | Saving selection. |
 | `READY` | Ready for `start()`. |
-| `CAPTURING` | Camera capture active. |
+| `CAPTURING_FRONT` | Camera capture active for the front. |
+| `CAPTURING_REAR` | Camera capture active for the rear. |
 | `SUBMITTING` | Submitting captured evidence. |
 | `PROCESSING` | Server processing in progress. |
 | `COMPLETE` | Processing finished. |

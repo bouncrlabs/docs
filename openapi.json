@@ -568,7 +568,8 @@
             "enum": [
               "PHASE_SELECTING_COUNTRY",
               "PHASE_SELECTING_DOCUMENT",
-              "PHASE_CAPTURING",
+              "PHASE_CAPTURING_FRONT",
+              "PHASE_CAPTURING_REAR",
               "PHASE_PROCESSING",
               "PHASE_COMPLETE"
             ]

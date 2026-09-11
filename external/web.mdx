@@ -68,7 +68,7 @@ export function Capture({ token, configuration }: Props) {
   }, [token, configuration]);
 
   const ready = sdk && (state?.phase === sdk.Phase.READY || state?.phase === sdk.Phase.STOPPED);
-  const active = sdk && state?.phase === sdk.Phase.CAPTURING;
+  const active = sdk && (state?.phase === sdk.Phase.CAPTURING_FRONT || state?.phase === sdk.Phase.CAPTURING_REAR);
   const complete = sdk && state?.phase === sdk.Phase.COMPLETE;
   const failed = loadError || (sdk && state?.phase === sdk.Phase.FAILED);
 
