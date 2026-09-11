@@ -5,18 +5,18 @@ description: "Install the SDK and start capture in React."
 
 ## Install
 
-Set `BOUNCR_NPM_TOKEN` to the package download token supplied by Bouncr. Add this to your project’s `.npmrc`:
+Set `BOUNCR_NPM_TOKEN` to your organization’s credential with the `packages:read` scope. Add this to your project’s `.npmrc`:
 
 ```ini .npmrc
-@bouncrlabs:registry=https://registry.npmjs.org/
-//registry.npmjs.org/:_authToken=${BOUNCR_NPM_TOKEN}
+@bouncrlabs:registry=https://registry.bouncrlabs.com/
+//registry.bouncrlabs.com/:_authToken=${BOUNCR_NPM_TOKEN}
 ```
 
 ```bash
 npm install @bouncrlabs/idv
 ```
 
-The SDK loads its versioned runtime from `cdn.bouncr.io`. The npm token is for installation only; do not pass it to `createCapture`.
+The SDK loads its versioned runtime from `cdn.bouncr.io`. The package download credential is for installation only; do not pass it to `createCapture`.
 
 ## Initialize
 
