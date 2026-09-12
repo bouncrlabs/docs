@@ -1,33 +1,15 @@
 ---
 title: "Testing"
-description: "Use a test credential and synthetic documents to see every outcome without paying for verification."
+description: "Scan a synthetic document with a test credential to get a known outcome."
 ---
 
-A test credential works like a live one, but its scans never reach the DMV, enrichment, or billing. They do not appear in dashboards or reports, and we delete them after 24 hours.
-
-<Steps>
-  <Step title="Get a test credential">
-    Ask us for an application in test mode. The mode does not change after we create the credential.
-  </Step>
-  <Step title="Scan a synthetic document">
-    Each document below produces one outcome. Print a barcode at 100% or show it on a second screen. The MRZ images use the OCR-B typeface, which the camera reads.
-  </Step>
-  <Step title="Read the outcome">
-    The scan goes through the full capture flow. `onComplete` fires and [Retrieve a scan](/external/api/get-scan) returns the outcome listed below. The `document` section holds the details parsed from the synthetic document.
-  </Step>
-</Steps>
-
-<Note>
-A test credential rejects any document that is not synthetic. A live credential rejects every synthetic document.
-</Note>
-
-## Documents
+Use a test credential with the documents below. Each one returns the outcome shown when you open it. Print a barcode at 100% or show it on a second screen; the MRZ images are set in OCR-B so the camera can read them.
 
 <Tabs>
   <Tab title="Driver's license">
     <AccordionGroup>
-      <Accordion title="Accept" description="Accept · real">
-        <Frame caption="Accept Test · T90000001">
+      <Accordion title="Accept">
+        <Frame caption="T90000001">
           <img src="/images/testing/drivers_license-accept.png" alt="Accept" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
@@ -36,8 +18,8 @@ A test credential rejects any document that is not synthetic. A live credential 
         <ResponseField name="verification.not_expired" type="true" />
         <ResponseField name="dldv" type="completed" />
       </Accordion>
-      <Accordion title="Expired" description="Reject · real · expired">
-        <Frame caption="Expired Test · T90000002">
+      <Accordion title="Expired">
+        <Frame caption="T90000002">
           <img src="/images/testing/drivers_license-expired.png" alt="Expired" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
@@ -46,8 +28,8 @@ A test credential rejects any document that is not synthetic. A live credential 
         <ResponseField name="verification.of_age" type="true" />
         <ResponseField name="verification.not_expired" type="false" />
       </Accordion>
-      <Accordion title="Underage" description="Reject · real · not of age">
-        <Frame caption="Underage Test · T90000003">
+      <Accordion title="Underage">
+        <Frame caption="T90000003">
           <img src="/images/testing/drivers_license-underage.png" alt="Underage" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
@@ -56,8 +38,8 @@ A test credential rejects any document that is not synthetic. A live credential 
         <ResponseField name="verification.of_age" type="false" />
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
-      <Accordion title="Invalid barcode" description="Reject · fake · barcode validation failed">
-        <Frame caption="Invalid Barcode Test · T90000004">
+      <Accordion title="Invalid barcode">
+        <Frame caption="T90000004">
           <img src="/images/testing/drivers_license-invalid_barcode.png" alt="Invalid barcode" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
@@ -66,8 +48,8 @@ A test credential rejects any document that is not synthetic. A live credential 
         <ResponseField name="verification.of_age" type="true" />
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
-      <Accordion title="Fake" description="Reject · fake · authentication failed">
-        <Frame caption="Fake Test · T90000005">
+      <Accordion title="Fake">
+        <Frame caption="T90000005">
           <img src="/images/testing/drivers_license-fake.png" alt="Fake" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
@@ -76,8 +58,8 @@ A test credential rejects any document that is not synthetic. A live credential 
         <ResponseField name="verification.of_age" type="true" />
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
-      <Accordion title="Repeat scan" description="Reject · real · multi scan">
-        <Frame caption="Repeat Scan Test · T90000006">
+      <Accordion title="Repeat scan">
+        <Frame caption="T90000006">
           <img src="/images/testing/drivers_license-repeat_scan.png" alt="Repeat scan" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
@@ -86,8 +68,8 @@ A test credential rejects any document that is not synthetic. A live credential 
         <ResponseField name="verification.of_age" type="true" />
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
-      <Accordion title="Listed" description="Reject · real · patron status">
-        <Frame caption="Listed Test · T90000007">
+      <Accordion title="Listed">
+        <Frame caption="T90000007">
           <img src="/images/testing/drivers_license-listed.png" alt="Listed" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
@@ -96,8 +78,8 @@ A test credential rejects any document that is not synthetic. A live credential 
         <ResponseField name="verification.of_age" type="true" />
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
-      <Accordion title="DMV verified" description="Accept · verified real">
-        <Frame caption="Dmv Verified Test · T90000008">
+      <Accordion title="DMV verified">
+        <Frame caption="T90000008">
           <img src="/images/testing/drivers_license-dmv_verified.png" alt="DMV verified" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
@@ -106,8 +88,8 @@ A test credential rejects any document that is not synthetic. A live credential 
         <ResponseField name="verification.not_expired" type="true" />
         <ResponseField name="dldv" type="completed" />
       </Accordion>
-      <Accordion title="DMV mismatch" description="Reject · verified fake · dmv verification failed">
-        <Frame caption="Dmv Mismatch Test · T90000009">
+      <Accordion title="DMV mismatch">
+        <Frame caption="T90000009">
           <img src="/images/testing/drivers_license-dmv_mismatch.png" alt="DMV mismatch" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
@@ -117,8 +99,8 @@ A test credential rejects any document that is not synthetic. A live credential 
         <ResponseField name="verification.not_expired" type="true" />
         <ResponseField name="dldv" type="completed" />
       </Accordion>
-      <Accordion title="DMV unavailable" description="Accept · real">
-        <Frame caption="Dmv Unavailable Test · T90000010">
+      <Accordion title="DMV unavailable">
+        <Frame caption="T90000010">
           <img src="/images/testing/drivers_license-dmv_unavailable.png" alt="DMV unavailable" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
@@ -127,8 +109,8 @@ A test credential rejects any document that is not synthetic. A live credential 
         <ResponseField name="verification.not_expired" type="true" />
         <ResponseField name="dldv" type="failed" />
       </Accordion>
-      <Accordion title="DMV ineligible" description="Accept · real">
-        <Frame caption="Dmv Ineligible Test · T90000011">
+      <Accordion title="DMV ineligible">
+        <Frame caption="T90000011">
           <img src="/images/testing/drivers_license-dmv_ineligible.png" alt="DMV ineligible" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
@@ -137,8 +119,8 @@ A test credential rejects any document that is not synthetic. A live credential 
         <ResponseField name="verification.not_expired" type="true" />
         <ResponseField name="dldv" type="invalid_document" />
       </Accordion>
-      <Accordion title="DMV nonparticipating" description="Accept · real">
-        <Frame caption="Dmv Nonparticipating Test · T90000012">
+      <Accordion title="DMV nonparticipating">
+        <Frame caption="T90000012">
           <img src="/images/testing/drivers_license-dmv_nonparticipating.png" alt="DMV nonparticipating" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
@@ -147,8 +129,8 @@ A test credential rejects any document that is not synthetic. A live credential 
         <ResponseField name="verification.not_expired" type="true" />
         <ResponseField name="dldv" type="jurisdiction_blocked" />
       </Accordion>
-      <Accordion title="Education age mismatch" description="Verify · possibly fake · education age discrepancy">
-        <Frame caption="Education Age Mismatch Test · T90000013">
+      <Accordion title="Education age mismatch">
+        <Frame caption="T90000013">
           <img src="/images/testing/drivers_license-education_age_mismatch.png" alt="Education age mismatch" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_VERIFY" />
@@ -157,8 +139,8 @@ A test credential rejects any document that is not synthetic. A live credential 
         <ResponseField name="verification.of_age" type="true" />
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
-      <Accordion title="Birth date mismatch" description="Verify · possibly fake · cross source dob discrepancy">
-        <Frame caption="Birth Date Mismatch Test · T90000014">
+      <Accordion title="Birth date mismatch">
+        <Frame caption="T90000014">
           <img src="/images/testing/drivers_license-birth_date_mismatch.png" alt="Birth date mismatch" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_VERIFY" />
@@ -167,8 +149,8 @@ A test credential rejects any document that is not synthetic. A live credential 
         <ResponseField name="verification.of_age" type="true" />
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
-      <Accordion title="Conflicting documents" description="Reject · fake · intra identity dob discrepancy">
-        <Frame caption="Conflicting Documents Test · T90000015">
+      <Accordion title="Conflicting documents">
+        <Frame caption="T90000015">
           <img src="/images/testing/drivers_license-conflicting_documents.png" alt="Conflicting documents" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
@@ -181,8 +163,8 @@ A test credential rejects any document that is not synthetic. A live credential 
   </Tab>
   <Tab title="Passport book">
     <AccordionGroup>
-      <Accordion title="Accept" description="Accept · real">
-        <Frame caption="Accept Test · T90000016">
+      <Accordion title="Accept">
+        <Frame caption="T90000016">
           <img src="/images/testing/passport_book-accept.png" alt="Accept" />
         </Frame>
         ```text
@@ -194,8 +176,8 @@ A test credential rejects any document that is not synthetic. A live credential 
         <ResponseField name="verification.of_age" type="true" />
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
-      <Accordion title="Expired" description="Reject · real · expired">
-        <Frame caption="Expired Test · T90000017">
+      <Accordion title="Expired">
+        <Frame caption="T90000017">
           <img src="/images/testing/passport_book-expired.png" alt="Expired" />
         </Frame>
         ```text
@@ -208,8 +190,8 @@ A test credential rejects any document that is not synthetic. A live credential 
         <ResponseField name="verification.of_age" type="true" />
         <ResponseField name="verification.not_expired" type="false" />
       </Accordion>
-      <Accordion title="Underage" description="Reject · real · not of age">
-        <Frame caption="Underage Test · T90000018">
+      <Accordion title="Underage">
+        <Frame caption="T90000018">
           <img src="/images/testing/passport_book-underage.png" alt="Underage" />
         </Frame>
         ```text
@@ -222,8 +204,8 @@ A test credential rejects any document that is not synthetic. A live credential 
         <ResponseField name="verification.of_age" type="false" />
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
-      <Accordion title="Invalid checksum" description="Reject · fake · barcode validation failed">
-        <Frame caption="Invalid Checksum Test · T90000019">
+      <Accordion title="Invalid checksum">
+        <Frame caption="T90000019">
           <img src="/images/testing/passport_book-invalid_checksum.png" alt="Invalid checksum" />
         </Frame>
         ```text
@@ -240,8 +222,8 @@ A test credential rejects any document that is not synthetic. A live credential 
   </Tab>
   <Tab title="Passport card">
     <AccordionGroup>
-      <Accordion title="Accept" description="Accept · real">
-        <Frame caption="Accept Test · T90000020">
+      <Accordion title="Accept">
+        <Frame caption="T90000020">
           <img src="/images/testing/passport_card-accept.png" alt="Accept" />
         </Frame>
         ```text
@@ -258,8 +240,8 @@ A test credential rejects any document that is not synthetic. A live credential 
   </Tab>
   <Tab title="Enhanced driver's license">
     <AccordionGroup>
-      <Accordion title="Accept" description="Accept · real">
-        <Frame caption="Accept Test · T90000021">
+      <Accordion title="Accept">
+        <Frame caption="T90000021">
           <img src="/images/testing/enhanced_drivers_license-accept.png" alt="Accept" />
         </Frame>
         ```text
@@ -276,8 +258,8 @@ A test credential rejects any document that is not synthetic. A live credential 
   </Tab>
   <Tab title="Other travel document">
     <AccordionGroup>
-      <Accordion title="Accept" description="Accept · real">
-        <Frame caption="Accept Test · T90000022">
+      <Accordion title="Accept">
+        <Frame caption="T90000022">
           <img src="/images/testing/other_travel_document-accept.png" alt="Accept" />
         </Frame>
         ```text
