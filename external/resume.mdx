@@ -3,14 +3,14 @@ title: "Resume a scan"
 description: "Restore accepted captures when a customer returns to your flow."
 ---
 
-Save the scan ID with your application record. When the customer returns, reuse that scan and request a fresh [initialization token](/external/api/create-token).
+Save the scan ID with your application record. When the customer returns, reuse that scan and request a fresh [session token](/external/api/create-token).
 
 Initialize a new SDK instance with the fresh token and the same scan’s configuration. The SDK restores the scan’s state. Call `start()` when it enters `Phase.READY` to capture any remaining side.
 
 | Saved progress | What happens on resume |
 | --- | --- |
 | No accepted capture | The SDK restores the saved selection, or requests any missing selection. |
-| At least one accepted side | The SDK requests the remaining capture. `state.resumable` is `true`. |
+| At least one accepted side | The SDK requests the remaining capture. `state.reading` is `UNSPECIFIED` because the document has been read. |
 | All required captures accepted | The SDK reports processing progress. |
 | Processing complete | The SDK reports completion. Retrieve the result from your backend. |
 

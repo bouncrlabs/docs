@@ -15,7 +15,7 @@ Before the first capture is accepted, update the country or document type:
 capture.update({ country: correctedCountry, documentType: correctedDocumentType });
 ```
 
-After a capture has been accepted, changing documents requires a new scan. `state.resumable` indicates accepted captures.
+After a capture has been accepted, changing documents requires a new scan; the server rejects further selection changes.
 
 ## Resume after failure
 
@@ -23,4 +23,4 @@ After a capture has been accepted, changing documents requires a new scan. `stat
 
 ## Browser requirements
 
-Capture requires HTTPS or localhost. Content Security Policy must allow `https://cdn.bouncr.io` for scripts and connections, `blob:` workers, and WebAssembly compilation.
+Capture requires HTTPS or localhost. Content Security Policy must allow `connect-src` to `https://cdn.bouncr.io` and to the API origin over `wss:`, same-origin workers (`worker-src 'self'`), and WebAssembly compilation (`'wasm-unsafe-eval'`).
