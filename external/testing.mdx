@@ -3,17 +3,7 @@ title: "Testing"
 description: "Scan a synthetic document with a test credential to get a known outcome."
 ---
 
-<Steps>
-  <Step title="Get a test credential">
-    Ask us for an application in test mode.
-  </Step>
-  <Step title="Scan a document below">
-    Each one returns the outcome shown when you open it.
-  </Step>
-  <Step title="Check the result">
-    `onComplete` fires and [Retrieve a scan](/external/api/get-scan) returns that outcome.
-  </Step>
-</Steps>
+Use a test credential with the documents below. Each one returns the outcome shown when you open it.
 
 <Tabs>
   <Tab title="Driver's license">
@@ -109,42 +99,12 @@ description: "Scan a synthetic document with a test credential to get a known ou
         <ResponseField name="verification.not_expired" type="true" />
         <ResponseField name="dldv" type="completed" />
       </Accordion>
-      <Accordion title="Education conflict">
-        <Frame caption="T90000010">
-          <img src="/images/testing/drivers_license-education_conflict.png" alt="Education conflict" />
-        </Frame>
-        <ResponseField name="verification.decision" type="DECISION_VERIFY" />
-        <ResponseField name="verification.integrity" type="INTEGRITY_POSSIBLY_FAKE" />
-        <ResponseField name="reason" type="REASON_EDUCATION_AGE_DISCREPANCY" />
-        <ResponseField name="verification.of_age" type="true" />
-        <ResponseField name="verification.not_expired" type="true" />
-      </Accordion>
-      <Accordion title="Birth date conflict">
-        <Frame caption="T90000011">
-          <img src="/images/testing/drivers_license-birth_date_conflict.png" alt="Birth date conflict" />
-        </Frame>
-        <ResponseField name="verification.decision" type="DECISION_VERIFY" />
-        <ResponseField name="verification.integrity" type="INTEGRITY_POSSIBLY_FAKE" />
-        <ResponseField name="reason" type="REASON_CROSS_SOURCE_DOB_DISCREPANCY" />
-        <ResponseField name="verification.of_age" type="true" />
-        <ResponseField name="verification.not_expired" type="true" />
-      </Accordion>
-      <Accordion title="Document conflict">
-        <Frame caption="T90000012">
-          <img src="/images/testing/drivers_license-document_conflict.png" alt="Document conflict" />
-        </Frame>
-        <ResponseField name="verification.decision" type="DECISION_REJECT" />
-        <ResponseField name="verification.integrity" type="INTEGRITY_FAKE" />
-        <ResponseField name="reason" type="REASON_INTRA_IDENTITY_DOB_DISCREPANCY" />
-        <ResponseField name="verification.of_age" type="true" />
-        <ResponseField name="verification.not_expired" type="true" />
-      </Accordion>
     </AccordionGroup>
   </Tab>
   <Tab title="Passport book">
     <AccordionGroup>
       <Accordion title="Accepted">
-        <Frame caption="T90000013">
+        <Frame caption="T90000010">
           <img src="/images/testing/passport_book-accepted.png" alt="Accepted" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
@@ -153,7 +113,7 @@ description: "Scan a synthetic document with a test credential to get a known ou
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
       <Accordion title="Expired document">
-        <Frame caption="T90000014">
+        <Frame caption="T90000011">
           <img src="/images/testing/passport_book-expired_document.png" alt="Expired document" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
@@ -163,7 +123,7 @@ description: "Scan a synthetic document with a test credential to get a known ou
         <ResponseField name="verification.not_expired" type="false" />
       </Accordion>
       <Accordion title="Underage holder">
-        <Frame caption="T90000015">
+        <Frame caption="T90000012">
           <img src="/images/testing/passport_book-underage_holder.png" alt="Underage holder" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
@@ -173,7 +133,7 @@ description: "Scan a synthetic document with a test credential to get a known ou
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
       <Accordion title="Damaged MRZ">
-        <Frame caption="T90000016">
+        <Frame caption="T90000013">
           <img src="/images/testing/passport_book-damaged_mrz.png" alt="Damaged MRZ" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
@@ -187,7 +147,7 @@ description: "Scan a synthetic document with a test credential to get a known ou
   <Tab title="Passport card">
     <AccordionGroup>
       <Accordion title="Accepted">
-        <Frame caption="T90000017">
+        <Frame caption="T90000014">
           <img src="/images/testing/passport_card-accepted.png" alt="Accepted" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
@@ -200,7 +160,7 @@ description: "Scan a synthetic document with a test credential to get a known ou
   <Tab title="Enhanced driver's license">
     <AccordionGroup>
       <Accordion title="Accepted">
-        <Frame caption="T90000018">
+        <Frame caption="T90000015">
           <img src="/images/testing/enhanced_drivers_license-accepted.png" alt="Accepted" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
@@ -213,7 +173,7 @@ description: "Scan a synthetic document with a test credential to get a known ou
   <Tab title="Other travel document">
     <AccordionGroup>
       <Accordion title="Accepted">
-        <Frame caption="T90000019">
+        <Frame caption="T90000016">
           <img src="/images/testing/other_travel_document-accepted.png" alt="Accepted" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
