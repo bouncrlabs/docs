@@ -3,14 +3,24 @@ title: "Testing"
 description: "Scan a synthetic document with a test credential to get a known outcome."
 ---
 
-Use a test credential with the documents below. Each one returns the outcome shown when you open it. Print a barcode at 100% or show it on a second screen; the MRZ images are set in OCR-B so the camera can read them.
+<Steps>
+  <Step title="Get a test credential">
+    Ask us for an application in test mode.
+  </Step>
+  <Step title="Scan a document below">
+    Each one returns the outcome shown when you open it.
+  </Step>
+  <Step title="Check the result">
+    `onComplete` fires and [Retrieve a scan](/external/api/get-scan) returns that outcome.
+  </Step>
+</Steps>
 
 <Tabs>
   <Tab title="Driver's license">
     <AccordionGroup>
-      <Accordion title="Accept">
+      <Accordion title="Accepted">
         <Frame caption="T90000001">
-          <img src="/images/testing/drivers_license-accept.png" alt="Accept" />
+          <img src="/images/testing/drivers_license-accepted.png" alt="Accepted" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
         <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
@@ -18,9 +28,9 @@ Use a test credential with the documents below. Each one returns the outcome sho
         <ResponseField name="verification.not_expired" type="true" />
         <ResponseField name="dldv" type="completed" />
       </Accordion>
-      <Accordion title="Expired">
+      <Accordion title="Expired document">
         <Frame caption="T90000002">
-          <img src="/images/testing/drivers_license-expired.png" alt="Expired" />
+          <img src="/images/testing/drivers_license-expired_document.png" alt="Expired document" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
         <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
@@ -28,9 +38,9 @@ Use a test credential with the documents below. Each one returns the outcome sho
         <ResponseField name="verification.of_age" type="true" />
         <ResponseField name="verification.not_expired" type="false" />
       </Accordion>
-      <Accordion title="Underage">
+      <Accordion title="Underage holder">
         <Frame caption="T90000003">
-          <img src="/images/testing/drivers_license-underage.png" alt="Underage" />
+          <img src="/images/testing/drivers_license-underage_holder.png" alt="Underage holder" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
         <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
@@ -38,9 +48,9 @@ Use a test credential with the documents below. Each one returns the outcome sho
         <ResponseField name="verification.of_age" type="false" />
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
-      <Accordion title="Invalid barcode">
+      <Accordion title="Damaged barcode">
         <Frame caption="T90000004">
-          <img src="/images/testing/drivers_license-invalid_barcode.png" alt="Invalid barcode" />
+          <img src="/images/testing/drivers_license-damaged_barcode.png" alt="Damaged barcode" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
         <ResponseField name="verification.integrity" type="INTEGRITY_FAKE" />
@@ -48,9 +58,9 @@ Use a test credential with the documents below. Each one returns the outcome sho
         <ResponseField name="verification.of_age" type="true" />
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
-      <Accordion title="Fake">
+      <Accordion title="Counterfeit document">
         <Frame caption="T90000005">
-          <img src="/images/testing/drivers_license-fake.png" alt="Fake" />
+          <img src="/images/testing/drivers_license-counterfeit_document.png" alt="Counterfeit document" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
         <ResponseField name="verification.integrity" type="INTEGRITY_FAKE" />
@@ -58,9 +68,9 @@ Use a test credential with the documents below. Each one returns the outcome sho
         <ResponseField name="verification.of_age" type="true" />
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
-      <Accordion title="Repeat scan">
+      <Accordion title="Duplicate scan">
         <Frame caption="T90000006">
-          <img src="/images/testing/drivers_license-repeat_scan.png" alt="Repeat scan" />
+          <img src="/images/testing/drivers_license-duplicate_scan.png" alt="Duplicate scan" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
         <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
@@ -68,9 +78,9 @@ Use a test credential with the documents below. Each one returns the outcome sho
         <ResponseField name="verification.of_age" type="true" />
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
-      <Accordion title="Listed">
+      <Accordion title="Flagged patron">
         <Frame caption="T90000007">
-          <img src="/images/testing/drivers_license-listed.png" alt="Listed" />
+          <img src="/images/testing/drivers_license-flagged_patron.png" alt="Flagged patron" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
         <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
@@ -78,9 +88,9 @@ Use a test credential with the documents below. Each one returns the outcome sho
         <ResponseField name="verification.of_age" type="true" />
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
-      <Accordion title="DMV verified">
+      <Accordion title="DMV confirmed">
         <Frame caption="T90000008">
-          <img src="/images/testing/drivers_license-dmv_verified.png" alt="DMV verified" />
+          <img src="/images/testing/drivers_license-dmv_confirmed.png" alt="DMV confirmed" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
         <ResponseField name="verification.integrity" type="INTEGRITY_VERIFIED_REAL" />
@@ -88,9 +98,9 @@ Use a test credential with the documents below. Each one returns the outcome sho
         <ResponseField name="verification.not_expired" type="true" />
         <ResponseField name="dldv" type="completed" />
       </Accordion>
-      <Accordion title="DMV mismatch">
+      <Accordion title="DMV rejected">
         <Frame caption="T90000009">
-          <img src="/images/testing/drivers_license-dmv_mismatch.png" alt="DMV mismatch" />
+          <img src="/images/testing/drivers_license-dmv_rejected.png" alt="DMV rejected" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
         <ResponseField name="verification.integrity" type="INTEGRITY_VERIFIED_FAKE" />
@@ -99,39 +109,9 @@ Use a test credential with the documents below. Each one returns the outcome sho
         <ResponseField name="verification.not_expired" type="true" />
         <ResponseField name="dldv" type="completed" />
       </Accordion>
-      <Accordion title="DMV unavailable">
+      <Accordion title="Education conflict">
         <Frame caption="T90000010">
-          <img src="/images/testing/drivers_license-dmv_unavailable.png" alt="DMV unavailable" />
-        </Frame>
-        <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
-        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
-        <ResponseField name="verification.of_age" type="true" />
-        <ResponseField name="verification.not_expired" type="true" />
-        <ResponseField name="dldv" type="failed" />
-      </Accordion>
-      <Accordion title="DMV ineligible">
-        <Frame caption="T90000011">
-          <img src="/images/testing/drivers_license-dmv_ineligible.png" alt="DMV ineligible" />
-        </Frame>
-        <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
-        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
-        <ResponseField name="verification.of_age" type="true" />
-        <ResponseField name="verification.not_expired" type="true" />
-        <ResponseField name="dldv" type="invalid_document" />
-      </Accordion>
-      <Accordion title="DMV nonparticipating">
-        <Frame caption="T90000012">
-          <img src="/images/testing/drivers_license-dmv_nonparticipating.png" alt="DMV nonparticipating" />
-        </Frame>
-        <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
-        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
-        <ResponseField name="verification.of_age" type="true" />
-        <ResponseField name="verification.not_expired" type="true" />
-        <ResponseField name="dldv" type="jurisdiction_blocked" />
-      </Accordion>
-      <Accordion title="Education age mismatch">
-        <Frame caption="T90000013">
-          <img src="/images/testing/drivers_license-education_age_mismatch.png" alt="Education age mismatch" />
+          <img src="/images/testing/drivers_license-education_conflict.png" alt="Education conflict" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_VERIFY" />
         <ResponseField name="verification.integrity" type="INTEGRITY_POSSIBLY_FAKE" />
@@ -139,9 +119,9 @@ Use a test credential with the documents below. Each one returns the outcome sho
         <ResponseField name="verification.of_age" type="true" />
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
-      <Accordion title="Birth date mismatch">
-        <Frame caption="T90000014">
-          <img src="/images/testing/drivers_license-birth_date_mismatch.png" alt="Birth date mismatch" />
+      <Accordion title="Birth date conflict">
+        <Frame caption="T90000011">
+          <img src="/images/testing/drivers_license-birth_date_conflict.png" alt="Birth date conflict" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_VERIFY" />
         <ResponseField name="verification.integrity" type="INTEGRITY_POSSIBLY_FAKE" />
@@ -149,9 +129,9 @@ Use a test credential with the documents below. Each one returns the outcome sho
         <ResponseField name="verification.of_age" type="true" />
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
-      <Accordion title="Conflicting documents">
-        <Frame caption="T90000015">
-          <img src="/images/testing/drivers_license-conflicting_documents.png" alt="Conflicting documents" />
+      <Accordion title="Document conflict">
+        <Frame caption="T90000012">
+          <img src="/images/testing/drivers_license-document_conflict.png" alt="Document conflict" />
         </Frame>
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
         <ResponseField name="verification.integrity" type="INTEGRITY_FAKE" />
@@ -163,55 +143,39 @@ Use a test credential with the documents below. Each one returns the outcome sho
   </Tab>
   <Tab title="Passport book">
     <AccordionGroup>
-      <Accordion title="Accept">
-        <Frame caption="T90000016">
-          <img src="/images/testing/passport_book-accept.png" alt="Accept" />
+      <Accordion title="Accepted">
+        <Frame caption="T90000013">
+          <img src="/images/testing/passport_book-accepted.png" alt="Accepted" />
         </Frame>
-        ```text
-        P<USATEST<<ACCEPT<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        T900000169USA9006061M3012109<<<<<<<<<<<<<<06
-        ```
         <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
         <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
         <ResponseField name="verification.of_age" type="true" />
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
-      <Accordion title="Expired">
-        <Frame caption="T90000017">
-          <img src="/images/testing/passport_book-expired.png" alt="Expired" />
+      <Accordion title="Expired document">
+        <Frame caption="T90000014">
+          <img src="/images/testing/passport_book-expired_document.png" alt="Expired document" />
         </Frame>
-        ```text
-        P<USATEST<<EXPIRED<<<<<<<<<<<<<<<<<<<<<<<<<<
-        T900000170USA9006061M2001012<<<<<<<<<<<<<<08
-        ```
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
         <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
         <ResponseField name="reason" type="REASON_EXPIRED" />
         <ResponseField name="verification.of_age" type="true" />
         <ResponseField name="verification.not_expired" type="false" />
       </Accordion>
-      <Accordion title="Underage">
-        <Frame caption="T90000018">
-          <img src="/images/testing/passport_book-underage.png" alt="Underage" />
+      <Accordion title="Underage holder">
+        <Frame caption="T90000015">
+          <img src="/images/testing/passport_book-underage_holder.png" alt="Underage holder" />
         </Frame>
-        ```text
-        P<USATEST<<UNDERAGE<<<<<<<<<<<<<<<<<<<<<<<<<
-        T900000181USA1506060M3012109<<<<<<<<<<<<<<00
-        ```
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
         <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
         <ResponseField name="reason" type="REASON_NOT_OF_AGE" />
         <ResponseField name="verification.of_age" type="false" />
         <ResponseField name="verification.not_expired" type="true" />
       </Accordion>
-      <Accordion title="Invalid checksum">
-        <Frame caption="T90000019">
-          <img src="/images/testing/passport_book-invalid_checksum.png" alt="Invalid checksum" />
+      <Accordion title="Damaged MRZ">
+        <Frame caption="T90000016">
+          <img src="/images/testing/passport_book-damaged_mrz.png" alt="Damaged MRZ" />
         </Frame>
-        ```text
-        P<USATEST<<INVALID<CHECKSUM<<<<<<<<<<<<<<<<<
-        T900000192USA9006061M3012109<<<<<<<<<<<<<<01
-        ```
         <ResponseField name="verification.decision" type="DECISION_REJECT" />
         <ResponseField name="verification.integrity" type="INTEGRITY_FAKE" />
         <ResponseField name="reason" type="REASON_BARCODE_VALIDATION_FAILED" />
@@ -222,15 +186,10 @@ Use a test credential with the documents below. Each one returns the outcome sho
   </Tab>
   <Tab title="Passport card">
     <AccordionGroup>
-      <Accordion title="Accept">
-        <Frame caption="T90000020">
-          <img src="/images/testing/passport_card-accept.png" alt="Accept" />
+      <Accordion title="Accepted">
+        <Frame caption="T90000017">
+          <img src="/images/testing/passport_card-accepted.png" alt="Accepted" />
         </Frame>
-        ```text
-        IPUSAT900000206<<<<<<<<<<<<<<<
-        9006061M3012109USA<<<<<<<<<<<2
-        TEST<<ACCEPT<<<<<<<<<<<<<<<<<<
-        ```
         <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
         <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
         <ResponseField name="verification.of_age" type="true" />
@@ -240,15 +199,10 @@ Use a test credential with the documents below. Each one returns the outcome sho
   </Tab>
   <Tab title="Enhanced driver's license">
     <AccordionGroup>
-      <Accordion title="Accept">
-        <Frame caption="T90000021">
-          <img src="/images/testing/enhanced_drivers_license-accept.png" alt="Accept" />
+      <Accordion title="Accepted">
+        <Frame caption="T90000018">
+          <img src="/images/testing/enhanced_drivers_license-accepted.png" alt="Accepted" />
         </Frame>
-        ```text
-        IDUSAT900000217<<<<<<<<<<<<<<<
-        9006061M3012109USAVA<<<<<<<<<7
-        TEST<<ACCEPT<<<<<<<<<<<<<<<<<<
-        ```
         <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
         <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
         <ResponseField name="verification.of_age" type="true" />
@@ -258,15 +212,10 @@ Use a test credential with the documents below. Each one returns the outcome sho
   </Tab>
   <Tab title="Other travel document">
     <AccordionGroup>
-      <Accordion title="Accept">
-        <Frame caption="T90000022">
-          <img src="/images/testing/other_travel_document-accept.png" alt="Accept" />
+      <Accordion title="Accepted">
+        <Frame caption="T90000019">
+          <img src="/images/testing/other_travel_document-accepted.png" alt="Accepted" />
         </Frame>
-        ```text
-        IDCANT900000228<<<<<<<<<<<<<<<
-        9006061M3012109CAN<<<<<<<<<<<8
-        TEST<<ACCEPT<<<<<<<<<<<<<<<<<<
-        ```
         <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
         <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
         <ResponseField name="verification.of_age" type="true" />
