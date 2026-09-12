@@ -1,218 +1,295 @@
 ---
 title: "Testing"
-description: "Scan synthetic documents with a test credential to exercise every outcome without spending on verification."
+description: "Use a test credential and synthetic documents to see every outcome without paying for verification."
 ---
 
-A **test credential** is an API application created in test mode. It runs the same SDK and API surface as a live credential, but its scans never reach the DMV, enrichment or billing, are hidden from every dashboard and report, and are deleted after 24 hours.
-
-Under a test credential, scanning one of the synthetic documents below returns that document's canned outcome. Scanning any other document parses normally but still skips vendors and billing. Under a live credential, every test document is rejected as `INTEGRITY_FAKE` with `REASON_AUTHENTICATION_FAILED`, so a printed test barcode never passes at a venue.
-
-Every test document belongs to a person whose surname is `TEST` and whose given names spell the scenario, so operators can tell at a glance what they scanned. Print the barcodes at 100% or show them on a second screen; MRZ images are set in OCR-B, the typeface the camera reads; the text below each one is there to copy.
-
-## Driver's licenses (PDF417)
-
-| Document | Number | Decision | Reason | Integrity | Of age | Not expired | DLDV |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| ACCEPT TEST | `T90000001` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | completed |
-| EXPIRED TEST | `T90000002` | `DECISION_REJECT` | `REASON_EXPIRED` | `INTEGRITY_REAL` | true | false | — |
-| UNDERAGE TEST | `T90000003` | `DECISION_REJECT` | `REASON_NOT_OF_AGE` | `INTEGRITY_REAL` | false | true | — |
-| BARCODE VALIDATION FAILED TEST | `T90000004` | `DECISION_REJECT` | `REASON_BARCODE_VALIDATION_FAILED` | `INTEGRITY_FAKE` | true | true | — |
-| AUTHENTICATION FAILED TEST | `T90000005` | `DECISION_REJECT` | `REASON_AUTHENTICATION_FAILED` | `INTEGRITY_FAKE` | true | true | — |
-| VIZ CROSS CHECK FAILED TEST | `T90000006` | `DECISION_VERIFY` | `REASON_VIZ_CROSS_CHECK_FAILED` | `INTEGRITY_POSSIBLY_FAKE` | true | true | — |
-| MULTI SCAN TEST | `T90000007` | `DECISION_REJECT` | `REASON_MULTI_SCAN` | `INTEGRITY_REAL` | true | true | — |
-| PATRON STATUS TEST | `T90000008` | `DECISION_REJECT` | `REASON_PATRON_STATUS` | `INTEGRITY_REAL` | true | true | — |
-| MIRAGE TEST | `T90000009` | `DECISION_REJECT` | `REASON_MIRAGE` | `INTEGRITY_REAL` | true | true | — |
-| DMV VERIFIED TEST | `T90000010` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_VERIFIED_REAL` | true | true | completed |
-| DMV VERIFICATION FAILED TEST | `T90000011` | `DECISION_REJECT` | `REASON_DMV_VERIFICATION_FAILED` | `INTEGRITY_VERIFIED_FAKE` | true | true | completed |
-| DMV PENDING TEST | `T90000012` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | pending |
-| DMV UNKNOWN ERROR TEST | `T90000013` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | unknown_error |
-| DMV BALANCE EXHAUSTED TEST | `T90000014` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | balance_exhausted |
-| DMV INVALID DOCUMENT TEST | `T90000015` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | invalid_document |
-| DMV JURISDICTION BLOCKED TEST | `T90000016` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | jurisdiction_blocked |
-| DMV FAILED TEST | `T90000017` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | failed |
-| DMV NOT ENTITLED TEST | `T90000018` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | not_entitled |
-| EDUCATION AGE DISCREPANCY TEST | `T90000019` | `DECISION_VERIFY` | `REASON_EDUCATION_AGE_DISCREPANCY` | `INTEGRITY_POSSIBLY_FAKE` | true | true | — |
-| CROSS SOURCE DOB DISCREPANCY TEST | `T90000020` | `DECISION_VERIFY` | `REASON_CROSS_SOURCE_DOB_DISCREPANCY` | `INTEGRITY_POSSIBLY_FAKE` | true | true | — |
-| INTRA IDENTITY DOB DISCREPANCY TEST | `T90000021` | `DECISION_REJECT` | `REASON_INTRA_IDENTITY_DOB_DISCREPANCY` | `INTEGRITY_FAKE` | true | true | — |
-| NO RESULT TEST | `T90000022` | `DECISION_UNSPECIFIED` | `REASON_UNSPECIFIED` | `INTEGRITY_UNSPECIFIED` | true | true | — |
-
-### ACCEPT TEST
-
-<img src="/images/testing/accept.png" alt="PDF417 barcode for ACCEPT TEST" width="600" />
-
-### EXPIRED TEST
-
-<img src="/images/testing/expired.png" alt="PDF417 barcode for EXPIRED TEST" width="600" />
-
-### UNDERAGE TEST
-
-<img src="/images/testing/underage.png" alt="PDF417 barcode for UNDERAGE TEST" width="600" />
-
-### BARCODE VALIDATION FAILED TEST
-
-<img src="/images/testing/barcode_validation_failed.png" alt="PDF417 barcode for BARCODE VALIDATION FAILED TEST" width="600" />
-
-### AUTHENTICATION FAILED TEST
-
-<img src="/images/testing/authentication_failed.png" alt="PDF417 barcode for AUTHENTICATION FAILED TEST" width="600" />
-
-### VIZ CROSS CHECK FAILED TEST
-
-<img src="/images/testing/viz_cross_check_failed.png" alt="PDF417 barcode for VIZ CROSS CHECK FAILED TEST" width="600" />
-
-### MULTI SCAN TEST
-
-<img src="/images/testing/multi_scan.png" alt="PDF417 barcode for MULTI SCAN TEST" width="600" />
-
-### PATRON STATUS TEST
-
-<img src="/images/testing/patron_status.png" alt="PDF417 barcode for PATRON STATUS TEST" width="600" />
-
-### MIRAGE TEST
-
-<img src="/images/testing/mirage.png" alt="PDF417 barcode for MIRAGE TEST" width="600" />
-
-### DMV VERIFIED TEST
-
-<img src="/images/testing/dmv_verified.png" alt="PDF417 barcode for DMV VERIFIED TEST" width="600" />
-
-### DMV VERIFICATION FAILED TEST
-
-<img src="/images/testing/dmv_verification_failed.png" alt="PDF417 barcode for DMV VERIFICATION FAILED TEST" width="600" />
-
-### DMV PENDING TEST
-
-<img src="/images/testing/dmv_pending.png" alt="PDF417 barcode for DMV PENDING TEST" width="600" />
-
-### DMV UNKNOWN ERROR TEST
-
-<img src="/images/testing/dmv_unknown_error.png" alt="PDF417 barcode for DMV UNKNOWN ERROR TEST" width="600" />
-
-### DMV BALANCE EXHAUSTED TEST
-
-<img src="/images/testing/dmv_balance_exhausted.png" alt="PDF417 barcode for DMV BALANCE EXHAUSTED TEST" width="600" />
-
-### DMV INVALID DOCUMENT TEST
-
-<img src="/images/testing/dmv_invalid_document.png" alt="PDF417 barcode for DMV INVALID DOCUMENT TEST" width="600" />
-
-### DMV JURISDICTION BLOCKED TEST
-
-<img src="/images/testing/dmv_jurisdiction_blocked.png" alt="PDF417 barcode for DMV JURISDICTION BLOCKED TEST" width="600" />
-
-### DMV FAILED TEST
-
-<img src="/images/testing/dmv_failed.png" alt="PDF417 barcode for DMV FAILED TEST" width="600" />
-
-### DMV NOT ENTITLED TEST
-
-<img src="/images/testing/dmv_not_entitled.png" alt="PDF417 barcode for DMV NOT ENTITLED TEST" width="600" />
-
-### EDUCATION AGE DISCREPANCY TEST
-
-<img src="/images/testing/education_age_discrepancy.png" alt="PDF417 barcode for EDUCATION AGE DISCREPANCY TEST" width="600" />
-
-### CROSS SOURCE DOB DISCREPANCY TEST
-
-<img src="/images/testing/cross_source_dob_discrepancy.png" alt="PDF417 barcode for CROSS SOURCE DOB DISCREPANCY TEST" width="600" />
-
-### INTRA IDENTITY DOB DISCREPANCY TEST
-
-<img src="/images/testing/intra_identity_dob_discrepancy.png" alt="PDF417 barcode for INTRA IDENTITY DOB DISCREPANCY TEST" width="600" />
-
-### NO RESULT TEST
-
-<img src="/images/testing/no_result.png" alt="PDF417 barcode for NO RESULT TEST" width="600" />
-
-## Passport books (TD3 MRZ)
-
-| Document | Number | Decision | Reason | Integrity | Of age | Not expired | DLDV |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| PASSPORT ACCEPT TEST | `T90000023` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | — |
-| PASSPORT EXPIRED TEST | `T90000024` | `DECISION_REJECT` | `REASON_EXPIRED` | `INTEGRITY_REAL` | true | false | — |
-| PASSPORT UNDERAGE TEST | `T90000025` | `DECISION_REJECT` | `REASON_NOT_OF_AGE` | `INTEGRITY_REAL` | false | true | — |
-| PASSPORT CHECKSUM FAILED TEST | `T90000026` | `DECISION_REJECT` | `REASON_BARCODE_VALIDATION_FAILED` | `INTEGRITY_FAKE` | true | true | — |
-
-### PASSPORT ACCEPT TEST
-
-<img src="/images/testing/passport_accept.png" alt="MRZ for PASSPORT ACCEPT TEST" width="600" />
-
-```text
-P<USATEST<<PASSPORT<ACCEPT<<<<<<<<<<<<<<<<<<
-T900000239USA9006061M3012109<<<<<<<<<<<<<<06
-```
-
-### PASSPORT EXPIRED TEST
-
-<img src="/images/testing/passport_expired.png" alt="MRZ for PASSPORT EXPIRED TEST" width="600" />
-
-```text
-P<USATEST<<PASSPORT<EXPIRED<<<<<<<<<<<<<<<<<
-T900000240USA9006061M2001012<<<<<<<<<<<<<<08
-```
-
-### PASSPORT UNDERAGE TEST
-
-<img src="/images/testing/passport_underage.png" alt="MRZ for PASSPORT UNDERAGE TEST" width="600" />
-
-```text
-P<USATEST<<PASSPORT<UNDERAGE<<<<<<<<<<<<<<<<
-T900000251USA1506060M3012109<<<<<<<<<<<<<<00
-```
-
-### PASSPORT CHECKSUM FAILED TEST
-
-<img src="/images/testing/passport_checksum_failed.png" alt="MRZ for PASSPORT CHECKSUM FAILED TEST" width="600" />
-
-```text
-P<USATEST<<PASSPORT<CHECKSUM<FAILED<<<<<<<<<
-T900000262USA9006061M3012109<<<<<<<<<<<<<<01
-```
-
-## Passport cards (TD1 MRZ)
-
-| Document | Number | Decision | Reason | Integrity | Of age | Not expired | DLDV |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| PASSPORT CARD ACCEPT TEST | `T90000027` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | — |
-
-### PASSPORT CARD ACCEPT TEST
-
-<img src="/images/testing/passport_card_accept.png" alt="MRZ for PASSPORT CARD ACCEPT TEST" width="600" />
-
-```text
-IPUSAT900000273<<<<<<<<<<<<<<<
-9006061M3012109USA<<<<<<<<<<<8
-TEST<<PASSPORT<CARD<ACCEPT<<<<
-```
-
-## Enhanced driver's licenses (TD1 MRZ)
-
-| Document | Number | Decision | Reason | Integrity | Of age | Not expired | DLDV |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| EDL ACCEPT TEST | `T90000028` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | — |
-
-### EDL ACCEPT TEST
-
-<img src="/images/testing/edl_accept.png" alt="MRZ for EDL ACCEPT TEST" width="600" />
-
-```text
-IDUSAT900000284<<<<<<<<<<<<<<<
-9006061M3012109USAVA<<<<<<<<<3
-TEST<<EDL<ACCEPT<<<<<<<<<<<<<<
-```
-
-## Other travel documents (TD1 MRZ)
-
-| Document | Number | Decision | Reason | Integrity | Of age | Not expired | DLDV |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| TRAVEL DOCUMENT ACCEPT TEST | `T90000029` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | — |
-
-### TRAVEL DOCUMENT ACCEPT TEST
-
-<img src="/images/testing/travel_document_accept.png" alt="MRZ for TRAVEL DOCUMENT ACCEPT TEST" width="600" />
-
-```text
-IDCANT900000295<<<<<<<<<<<<<<<
-9006061M3012109CAN<<<<<<<<<<<4
-TEST<<TRAVEL<DOCUMENT<ACCEPT<<
-```
+A test credential works like a live one, but its scans never reach the DMV, enrichment, or billing. They do not appear in dashboards or reports, and we delete them after 24 hours.
+
+<Steps>
+  <Step title="Get a test credential">
+    Ask us for an application in test mode. The mode does not change after we create the credential.
+  </Step>
+  <Step title="Scan a synthetic document">
+    Each document below produces one outcome. Print a barcode at 100% or show it on a second screen. The MRZ images use the OCR-B typeface, which the camera reads.
+  </Step>
+  <Step title="Read the outcome">
+    The scan goes through the full capture flow. `onComplete` fires and [Retrieve a scan](/external/api/get-scan) returns the outcome listed below. The `document` section holds the details parsed from the synthetic document.
+  </Step>
+</Steps>
+
+<Note>
+A test credential rejects any document that is not synthetic. A live credential rejects every synthetic document.
+</Note>
+
+## Documents
+
+<Tabs>
+  <Tab title="Driver's license">
+    <AccordionGroup>
+      <Accordion title="Accept" description="Accept · real">
+        <Frame caption="Accept Test · T90000001">
+          <img src="/images/testing/drivers_license-accept.png" alt="Accept" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+        <ResponseField name="dldv" type="completed" />
+      </Accordion>
+      <Accordion title="Expired" description="Reject · real · expired">
+        <Frame caption="Expired Test · T90000002">
+          <img src="/images/testing/drivers_license-expired.png" alt="Expired" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="reason" type="REASON_EXPIRED" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="false" />
+      </Accordion>
+      <Accordion title="Underage" description="Reject · real · not of age">
+        <Frame caption="Underage Test · T90000003">
+          <img src="/images/testing/drivers_license-underage.png" alt="Underage" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="reason" type="REASON_NOT_OF_AGE" />
+        <ResponseField name="verification.of_age" type="false" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+      <Accordion title="Invalid barcode" description="Reject · fake · barcode validation failed">
+        <Frame caption="Invalid Barcode Test · T90000004">
+          <img src="/images/testing/drivers_license-invalid_barcode.png" alt="Invalid barcode" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_FAKE" />
+        <ResponseField name="reason" type="REASON_BARCODE_VALIDATION_FAILED" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+      <Accordion title="Fake" description="Reject · fake · authentication failed">
+        <Frame caption="Fake Test · T90000005">
+          <img src="/images/testing/drivers_license-fake.png" alt="Fake" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_FAKE" />
+        <ResponseField name="reason" type="REASON_AUTHENTICATION_FAILED" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+      <Accordion title="Repeat scan" description="Reject · real · multi scan">
+        <Frame caption="Repeat Scan Test · T90000006">
+          <img src="/images/testing/drivers_license-repeat_scan.png" alt="Repeat scan" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="reason" type="REASON_MULTI_SCAN" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+      <Accordion title="Listed" description="Reject · real · patron status">
+        <Frame caption="Listed Test · T90000007">
+          <img src="/images/testing/drivers_license-listed.png" alt="Listed" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="reason" type="REASON_PATRON_STATUS" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+      <Accordion title="DMV verified" description="Accept · verified real">
+        <Frame caption="Dmv Verified Test · T90000008">
+          <img src="/images/testing/drivers_license-dmv_verified.png" alt="DMV verified" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_VERIFIED_REAL" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+        <ResponseField name="dldv" type="completed" />
+      </Accordion>
+      <Accordion title="DMV mismatch" description="Reject · verified fake · dmv verification failed">
+        <Frame caption="Dmv Mismatch Test · T90000009">
+          <img src="/images/testing/drivers_license-dmv_mismatch.png" alt="DMV mismatch" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_VERIFIED_FAKE" />
+        <ResponseField name="reason" type="REASON_DMV_VERIFICATION_FAILED" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+        <ResponseField name="dldv" type="completed" />
+      </Accordion>
+      <Accordion title="DMV unavailable" description="Accept · real">
+        <Frame caption="Dmv Unavailable Test · T90000010">
+          <img src="/images/testing/drivers_license-dmv_unavailable.png" alt="DMV unavailable" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+        <ResponseField name="dldv" type="failed" />
+      </Accordion>
+      <Accordion title="DMV ineligible" description="Accept · real">
+        <Frame caption="Dmv Ineligible Test · T90000011">
+          <img src="/images/testing/drivers_license-dmv_ineligible.png" alt="DMV ineligible" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+        <ResponseField name="dldv" type="invalid_document" />
+      </Accordion>
+      <Accordion title="DMV nonparticipating" description="Accept · real">
+        <Frame caption="Dmv Nonparticipating Test · T90000012">
+          <img src="/images/testing/drivers_license-dmv_nonparticipating.png" alt="DMV nonparticipating" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+        <ResponseField name="dldv" type="jurisdiction_blocked" />
+      </Accordion>
+      <Accordion title="Education age mismatch" description="Verify · possibly fake · education age discrepancy">
+        <Frame caption="Education Age Mismatch Test · T90000013">
+          <img src="/images/testing/drivers_license-education_age_mismatch.png" alt="Education age mismatch" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_VERIFY" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_POSSIBLY_FAKE" />
+        <ResponseField name="reason" type="REASON_EDUCATION_AGE_DISCREPANCY" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+      <Accordion title="Birth date mismatch" description="Verify · possibly fake · cross source dob discrepancy">
+        <Frame caption="Birth Date Mismatch Test · T90000014">
+          <img src="/images/testing/drivers_license-birth_date_mismatch.png" alt="Birth date mismatch" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_VERIFY" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_POSSIBLY_FAKE" />
+        <ResponseField name="reason" type="REASON_CROSS_SOURCE_DOB_DISCREPANCY" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+      <Accordion title="Conflicting documents" description="Reject · fake · intra identity dob discrepancy">
+        <Frame caption="Conflicting Documents Test · T90000015">
+          <img src="/images/testing/drivers_license-conflicting_documents.png" alt="Conflicting documents" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_FAKE" />
+        <ResponseField name="reason" type="REASON_INTRA_IDENTITY_DOB_DISCREPANCY" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+    </AccordionGroup>
+  </Tab>
+  <Tab title="Passport book">
+    <AccordionGroup>
+      <Accordion title="Accept" description="Accept · real">
+        <Frame caption="Accept Test · T90000016">
+          <img src="/images/testing/passport_book-accept.png" alt="Accept" />
+        </Frame>
+        ```text
+        P<USATEST<<ACCEPT<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        T900000169USA9006061M3012109<<<<<<<<<<<<<<06
+        ```
+        <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+      <Accordion title="Expired" description="Reject · real · expired">
+        <Frame caption="Expired Test · T90000017">
+          <img src="/images/testing/passport_book-expired.png" alt="Expired" />
+        </Frame>
+        ```text
+        P<USATEST<<EXPIRED<<<<<<<<<<<<<<<<<<<<<<<<<<
+        T900000170USA9006061M2001012<<<<<<<<<<<<<<08
+        ```
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="reason" type="REASON_EXPIRED" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="false" />
+      </Accordion>
+      <Accordion title="Underage" description="Reject · real · not of age">
+        <Frame caption="Underage Test · T90000018">
+          <img src="/images/testing/passport_book-underage.png" alt="Underage" />
+        </Frame>
+        ```text
+        P<USATEST<<UNDERAGE<<<<<<<<<<<<<<<<<<<<<<<<<
+        T900000181USA1506060M3012109<<<<<<<<<<<<<<00
+        ```
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="reason" type="REASON_NOT_OF_AGE" />
+        <ResponseField name="verification.of_age" type="false" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+      <Accordion title="Invalid checksum" description="Reject · fake · barcode validation failed">
+        <Frame caption="Invalid Checksum Test · T90000019">
+          <img src="/images/testing/passport_book-invalid_checksum.png" alt="Invalid checksum" />
+        </Frame>
+        ```text
+        P<USATEST<<INVALID<CHECKSUM<<<<<<<<<<<<<<<<<
+        T900000192USA9006061M3012109<<<<<<<<<<<<<<01
+        ```
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_FAKE" />
+        <ResponseField name="reason" type="REASON_BARCODE_VALIDATION_FAILED" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+    </AccordionGroup>
+  </Tab>
+  <Tab title="Passport card">
+    <AccordionGroup>
+      <Accordion title="Accept" description="Accept · real">
+        <Frame caption="Accept Test · T90000020">
+          <img src="/images/testing/passport_card-accept.png" alt="Accept" />
+        </Frame>
+        ```text
+        IPUSAT900000206<<<<<<<<<<<<<<<
+        9006061M3012109USA<<<<<<<<<<<2
+        TEST<<ACCEPT<<<<<<<<<<<<<<<<<<
+        ```
+        <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+    </AccordionGroup>
+  </Tab>
+  <Tab title="Enhanced driver's license">
+    <AccordionGroup>
+      <Accordion title="Accept" description="Accept · real">
+        <Frame caption="Accept Test · T90000021">
+          <img src="/images/testing/enhanced_drivers_license-accept.png" alt="Accept" />
+        </Frame>
+        ```text
+        IDUSAT900000217<<<<<<<<<<<<<<<
+        9006061M3012109USAVA<<<<<<<<<7
+        TEST<<ACCEPT<<<<<<<<<<<<<<<<<<
+        ```
+        <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+    </AccordionGroup>
+  </Tab>
+  <Tab title="Other travel document">
+    <AccordionGroup>
+      <Accordion title="Accept" description="Accept · real">
+        <Frame caption="Accept Test · T90000022">
+          <img src="/images/testing/other_travel_document-accept.png" alt="Accept" />
+        </Frame>
+        ```text
+        IDCANT900000228<<<<<<<<<<<<<<<
+        9006061M3012109CAN<<<<<<<<<<<8
+        TEST<<ACCEPT<<<<<<<<<<<<<<<<<<
+        ```
+        <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+    </AccordionGroup>
+  </Tab>
+</Tabs>
