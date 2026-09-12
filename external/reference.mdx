@@ -11,10 +11,10 @@ Initializes the SDK and loads the scan’s state. Returns a promise for the capt
 Mounted preview element.
 </ParamField>
 <ParamField body="token" type="string" required>
-Capture token returned by the API.
+Session token returned by the API.
 </ParamField>
 <ParamField body="configuration" type="string" required>
-Configuration returned with the capture token. Pass unchanged.
+Configuration returned with the session token. Pass unchanged.
 </ParamField>
 <ParamField body="onState" type="(state: SessionState) => void" required>
 Receives lifecycle, selection, guidance, and error updates.

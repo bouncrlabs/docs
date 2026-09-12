@@ -8,15 +8,15 @@ description: "Initialize capture from your backend."
 ```json
 {
   "id": "124854268324842880",
-  "capture": {
-    "token": "<capture token>",
+  "session": {
+    "token": "<session token>",
     "expires_at": "2026-09-09T14:10:00Z",
     "configuration": "<encoded configuration>"
   }
 }
 ```
 
-Save `id` with your application record and pass `capture.token` and `capture.configuration` to [`createSession`](/external/web). The SDK then talks to Bouncr over a single WebSocket (`wss://<api>/v1/stream`, binary protobuf frames); allow that origin in your page's `connect-src` alongside `https://cdn.bouncr.io`.
+Save `id` with your application record and pass `session.token` and `session.configuration` to [`createSession`](/external/web). The SDK then talks to Bouncr over a single WebSocket (`wss://<api>/v1/stream`, binary protobuf frames); allow that origin in your page's `connect-src` alongside `https://cdn.bouncr.io`.
 
 
 ## Country and document selection
@@ -25,7 +25,7 @@ Supply `country` and `document_type` when creating the scan if your application 
 
 ## Resume capture
 
-[Create a capture token](/external/api/create-token) for the existing scan and initialize the SDK with the response. Accepted captures are restored. See [Resume capture](/external/resume).
+[Create a session token](/external/api/create-token) for the existing scan and initialize the SDK with the response. Accepted captures are restored. See [Resume capture](/external/resume).
 
 ## Retrieve the result
 

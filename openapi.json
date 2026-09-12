@@ -27,7 +27,7 @@
       "post": {
         "operationId": "create_scan",
         "summary": "Create a scan",
-        "description": "Create a scan using the venue’s document policy. Include scans:update to receive SDK initialization data in the same response.\n\nRequired scope: `scans:create`.",
+        "description": "Create a scan using the venue’s document policy. Include scans:update to receive session initialization data in the same response.\n\nRequired scope: `scans:create`.",
         "tags": [
           "Scans"
         ],
@@ -240,7 +240,7 @@
     "/v1/scans/{scan_id}/tokens": {
       "post": {
         "operationId": "create_capture_token",
-        "summary": "Create a capture token",
+        "summary": "Create a session token",
         "description": "Initialize or resume capture for an existing scan. Pass token and configuration to createSession.\n\nRequired scope: `scans:update`.",
         "tags": [
           "Scans"
@@ -271,7 +271,7 @@
         },
         "x-mint": {
           "metadata": {
-            "title": "Create a capture token"
+            "title": "Create a session token"
           }
         },
         "parameters": [
@@ -309,7 +309,7 @@
           "id": {
             "$ref": "#/components/schemas/ScanId"
           },
-          "capture": {
+          "session": {
             "$ref": "#/components/schemas/CaptureInitialization",
             "description": "Included when the credential has scans:update."
           }
