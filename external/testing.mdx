@@ -1,0 +1,204 @@
+---
+title: "Testing"
+description: "Scan synthetic documents with a test credential to exercise every outcome without spending on verification."
+---
+
+A **test credential** is an API application created in test mode. It runs the same SDK and API surface as a live credential, but its scans never reach the DMV, enrichment or billing, are hidden from every dashboard and report, and are deleted after 24 hours.
+
+Under a test credential, scanning one of the synthetic documents below returns that document's canned outcome. Scanning any other document parses normally but still skips vendors and billing. Under a live credential, every test document is rejected as `INTEGRITY_FAKE` with `REASON_AUTHENTICATION_FAILED`, so a printed test barcode never passes at a venue.
+
+Every test document belongs to a person whose surname is `TEST` and whose given names spell the scenario, so operators can tell at a glance what they scanned. Print the barcodes at 100% or show them on a second screen; MRZ lines must be printed in the OCR-B typeface to be read by the camera.
+
+## Driver's licenses (PDF417)
+
+| Document | Number | Decision | Reason | Integrity | Of age | Not expired | DLDV | Simulates |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| ACCEPT TEST | `T90000001` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | completed | Accepted, no findings. |
+| EXPIRED TEST | `T90000002` | `DECISION_REJECT` | `REASON_EXPIRED` | `INTEGRITY_REAL` | true | false | — | Rejected: the document is past its expiration date. |
+| UNDERAGE TEST | `T90000003` | `DECISION_REJECT` | `REASON_NOT_OF_AGE` | `INTEGRITY_REAL` | false | true | — | Rejected: the holder is below the venue's minimum age. |
+| BARCODE VALIDATION FAILED TEST | `T90000004` | `DECISION_REJECT` | `REASON_BARCODE_VALIDATION_FAILED` | `INTEGRITY_FAKE` | true | true | — | Rejected: the barcode fails structural validation. |
+| AUTHENTICATION FAILED TEST | `T90000005` | `DECISION_REJECT` | `REASON_AUTHENTICATION_FAILED` | `INTEGRITY_FAKE` | true | true | — | Rejected: the document fails authentication. |
+| VIZ CROSS CHECK FAILED TEST | `T90000006` | `DECISION_VERIFY` | `REASON_VIZ_CROSS_CHECK_FAILED` | `INTEGRITY_POSSIBLY_FAKE` | true | true | — | Needs review: the printed side disagrees with the barcode. |
+| MULTI SCAN TEST | `T90000007` | `DECISION_REJECT` | `REASON_MULTI_SCAN` | `INTEGRITY_REAL` | true | true | — | Rejected: the same document was scanned moments ago. |
+| PATRON STATUS TEST | `T90000008` | `DECISION_REJECT` | `REASON_PATRON_STATUS` | `INTEGRITY_REAL` | true | true | — | Rejected: the holder is on a venue, organization or network list. |
+| MIRAGE TEST | `T90000009` | `DECISION_REJECT` | `REASON_MIRAGE` | `INTEGRITY_REAL` | true | true | — | Rejected: the holder could not have travelled from their previous scan. |
+| DMV VERIFIED TEST | `T90000010` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_VERIFIED_REAL` | true | true | completed | Accepted: the issuing DMV confirmed the record. |
+| DMV VERIFICATION FAILED TEST | `T90000011` | `DECISION_REJECT` | `REASON_DMV_VERIFICATION_FAILED` | `INTEGRITY_VERIFIED_FAKE` | true | true | completed | Rejected: the issuing DMV contradicted the record. |
+| DMV PENDING TEST | `T90000012` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | pending | Stays in PROCESSING: the DMV request never returns. |
+| DMV UNKNOWN ERROR TEST | `T90000013` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | unknown_error | Accepted, DMV request ended in an unknown error. |
+| DMV BALANCE EXHAUSTED TEST | `T90000014` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | balance_exhausted | Accepted, DMV request skipped: balance exhausted. |
+| DMV INVALID DOCUMENT TEST | `T90000015` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | invalid_document | Accepted, DMV request skipped: document not eligible. |
+| DMV JURISDICTION BLOCKED TEST | `T90000016` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | jurisdiction_blocked | Accepted, DMV request skipped: jurisdiction does not participate. |
+| DMV FAILED TEST | `T90000017` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | failed | Accepted, DMV request failed. |
+| DMV NOT ENTITLED TEST | `T90000018` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | not_entitled | Accepted, DMV request skipped: not entitled. |
+| EDUCATION AGE DISCREPANCY TEST | `T90000019` | `DECISION_VERIFY` | `REASON_EDUCATION_AGE_DISCREPANCY` | `INTEGRITY_POSSIBLY_FAKE` | true | true | — | Needs review: education history does not fit the date of birth. |
+| CROSS SOURCE DOB DISCREPANCY TEST | `T90000020` | `DECISION_VERIFY` | `REASON_CROSS_SOURCE_DOB_DISCREPANCY` | `INTEGRITY_POSSIBLY_FAKE` | true | true | — | Needs review: another source reports a different date of birth. |
+| INTRA IDENTITY DOB DISCREPANCY TEST | `T90000021` | `DECISION_REJECT` | `REASON_INTRA_IDENTITY_DOB_DISCREPANCY` | `INTEGRITY_FAKE` | true | true | — | Rejected: this identity's documents disagree on date of birth. |
+| NO RESULT TEST | `T90000022` | `DECISION_UNSPECIFIED` | `REASON_UNSPECIFIED` | `INTEGRITY_UNSPECIFIED` | false | false | — | Processed without a decision. |
+
+### ACCEPT TEST
+
+<img src="/images/testing/accept.png" alt="PDF417 barcode for ACCEPT TEST" width="440" />
+
+### EXPIRED TEST
+
+<img src="/images/testing/expired.png" alt="PDF417 barcode for EXPIRED TEST" width="440" />
+
+### UNDERAGE TEST
+
+<img src="/images/testing/underage.png" alt="PDF417 barcode for UNDERAGE TEST" width="440" />
+
+### BARCODE VALIDATION FAILED TEST
+
+<img src="/images/testing/barcode_validation_failed.png" alt="PDF417 barcode for BARCODE VALIDATION FAILED TEST" width="440" />
+
+### AUTHENTICATION FAILED TEST
+
+<img src="/images/testing/authentication_failed.png" alt="PDF417 barcode for AUTHENTICATION FAILED TEST" width="440" />
+
+### VIZ CROSS CHECK FAILED TEST
+
+<img src="/images/testing/viz_cross_check_failed.png" alt="PDF417 barcode for VIZ CROSS CHECK FAILED TEST" width="440" />
+
+### MULTI SCAN TEST
+
+<img src="/images/testing/multi_scan.png" alt="PDF417 barcode for MULTI SCAN TEST" width="440" />
+
+### PATRON STATUS TEST
+
+<img src="/images/testing/patron_status.png" alt="PDF417 barcode for PATRON STATUS TEST" width="440" />
+
+### MIRAGE TEST
+
+<img src="/images/testing/mirage.png" alt="PDF417 barcode for MIRAGE TEST" width="440" />
+
+### DMV VERIFIED TEST
+
+<img src="/images/testing/dmv_verified.png" alt="PDF417 barcode for DMV VERIFIED TEST" width="440" />
+
+### DMV VERIFICATION FAILED TEST
+
+<img src="/images/testing/dmv_verification_failed.png" alt="PDF417 barcode for DMV VERIFICATION FAILED TEST" width="440" />
+
+### DMV PENDING TEST
+
+<img src="/images/testing/dmv_pending.png" alt="PDF417 barcode for DMV PENDING TEST" width="440" />
+
+### DMV UNKNOWN ERROR TEST
+
+<img src="/images/testing/dmv_unknown_error.png" alt="PDF417 barcode for DMV UNKNOWN ERROR TEST" width="440" />
+
+### DMV BALANCE EXHAUSTED TEST
+
+<img src="/images/testing/dmv_balance_exhausted.png" alt="PDF417 barcode for DMV BALANCE EXHAUSTED TEST" width="440" />
+
+### DMV INVALID DOCUMENT TEST
+
+<img src="/images/testing/dmv_invalid_document.png" alt="PDF417 barcode for DMV INVALID DOCUMENT TEST" width="440" />
+
+### DMV JURISDICTION BLOCKED TEST
+
+<img src="/images/testing/dmv_jurisdiction_blocked.png" alt="PDF417 barcode for DMV JURISDICTION BLOCKED TEST" width="440" />
+
+### DMV FAILED TEST
+
+<img src="/images/testing/dmv_failed.png" alt="PDF417 barcode for DMV FAILED TEST" width="440" />
+
+### DMV NOT ENTITLED TEST
+
+<img src="/images/testing/dmv_not_entitled.png" alt="PDF417 barcode for DMV NOT ENTITLED TEST" width="440" />
+
+### EDUCATION AGE DISCREPANCY TEST
+
+<img src="/images/testing/education_age_discrepancy.png" alt="PDF417 barcode for EDUCATION AGE DISCREPANCY TEST" width="440" />
+
+### CROSS SOURCE DOB DISCREPANCY TEST
+
+<img src="/images/testing/cross_source_dob_discrepancy.png" alt="PDF417 barcode for CROSS SOURCE DOB DISCREPANCY TEST" width="440" />
+
+### INTRA IDENTITY DOB DISCREPANCY TEST
+
+<img src="/images/testing/intra_identity_dob_discrepancy.png" alt="PDF417 barcode for INTRA IDENTITY DOB DISCREPANCY TEST" width="440" />
+
+### NO RESULT TEST
+
+<img src="/images/testing/no_result.png" alt="PDF417 barcode for NO RESULT TEST" width="440" />
+
+## Passport books (TD3 MRZ)
+
+| Document | Number | Decision | Reason | Integrity | Of age | Not expired | DLDV | Simulates |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| PASSPORT ACCEPT TEST | `T90000023` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | — | Accepted passport book. |
+| PASSPORT EXPIRED TEST | `T90000024` | `DECISION_REJECT` | `REASON_EXPIRED` | `INTEGRITY_REAL` | true | false | — | Rejected: expired passport book. |
+| PASSPORT UNDERAGE TEST | `T90000025` | `DECISION_REJECT` | `REASON_NOT_OF_AGE` | `INTEGRITY_REAL` | false | true | — | Rejected: underage passport holder. |
+| PASSPORT CHECKSUM FAILED TEST | `T90000026` | `DECISION_REJECT` | `REASON_BARCODE_VALIDATION_FAILED` | `INTEGRITY_FAKE` | true | true | — | Rejected: MRZ check digits fail. |
+
+### PASSPORT ACCEPT TEST
+
+```text
+P<USATEST<<PASSPORT<ACCEPT<<<<<<<<<<<<<<<<<<
+T900000239USA9006061M3012109<<<<<<<<<<<<<<06
+```
+
+### PASSPORT EXPIRED TEST
+
+```text
+P<USATEST<<PASSPORT<EXPIRED<<<<<<<<<<<<<<<<<
+T900000240USA9006061M2001012<<<<<<<<<<<<<<08
+```
+
+### PASSPORT UNDERAGE TEST
+
+```text
+P<USATEST<<PASSPORT<UNDERAGE<<<<<<<<<<<<<<<<
+T900000251USA1506060M3012109<<<<<<<<<<<<<<00
+```
+
+### PASSPORT CHECKSUM FAILED TEST
+
+```text
+P<USATEST<<PASSPORT<CHECKSUM<FAILED<<<<<<<<<
+T900000262USA9006061M3012109<<<<<<<<<<<<<<01
+```
+
+## Passport cards (TD1 MRZ)
+
+| Document | Number | Decision | Reason | Integrity | Of age | Not expired | DLDV | Simulates |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| PASSPORT CARD ACCEPT TEST | `T90000027` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | — | Accepted passport card. |
+
+### PASSPORT CARD ACCEPT TEST
+
+```text
+IPUSAT900000273<<<<<<<<<<<<<<<
+9006061M3012109USA<<<<<<<<<<<8
+TEST<<PASSPORT<CARD<ACCEPT<<<<
+```
+
+## Enhanced driver's licenses (TD1 MRZ)
+
+| Document | Number | Decision | Reason | Integrity | Of age | Not expired | DLDV | Simulates |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EDL ACCEPT TEST | `T90000028` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | — | Accepted enhanced driver's license. |
+
+### EDL ACCEPT TEST
+
+```text
+IDUSAT900000284<<<<<<<<<<<<<<<
+9006061M3012109USAVA<<<<<<<<<3
+TEST<<EDL<ACCEPT<<<<<<<<<<<<<<
+```
+
+## Other travel documents (TD1 MRZ)
+
+| Document | Number | Decision | Reason | Integrity | Of age | Not expired | DLDV | Simulates |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| TRAVEL DOCUMENT ACCEPT TEST | `T90000029` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | — | Accepted non-US travel document. |
+
+### TRAVEL DOCUMENT ACCEPT TEST
+
+```text
+IDCANT900000295<<<<<<<<<<<<<<<
+9006061M3012109CAN<<<<<<<<<<<4
+TEST<<TRAVEL<DOCUMENT<ACCEPT<<
+```
