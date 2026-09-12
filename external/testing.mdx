@@ -1,0 +1,186 @@
+---
+title: "Testing"
+description: "Scan a synthetic document with a test credential to get a known outcome."
+---
+
+Use a test credential with the documents below. Each one returns the outcome shown when you open it.
+
+<Tabs>
+  <Tab title="Driver's license">
+    <AccordionGroup>
+      <Accordion title="Accepted">
+        <Frame caption="T90000001">
+          <img src="/images/testing/drivers_license-accepted.png" alt="Accepted" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+        <ResponseField name="dldv" type="completed" />
+      </Accordion>
+      <Accordion title="Expired document">
+        <Frame caption="T90000002">
+          <img src="/images/testing/drivers_license-expired_document.png" alt="Expired document" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="reason" type="REASON_EXPIRED" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="false" />
+      </Accordion>
+      <Accordion title="Underage holder">
+        <Frame caption="T90000003">
+          <img src="/images/testing/drivers_license-underage_holder.png" alt="Underage holder" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="reason" type="REASON_NOT_OF_AGE" />
+        <ResponseField name="verification.of_age" type="false" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+      <Accordion title="Damaged barcode">
+        <Frame caption="T90000004">
+          <img src="/images/testing/drivers_license-damaged_barcode.png" alt="Damaged barcode" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_FAKE" />
+        <ResponseField name="reason" type="REASON_BARCODE_VALIDATION_FAILED" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+      <Accordion title="Counterfeit document">
+        <Frame caption="T90000005">
+          <img src="/images/testing/drivers_license-counterfeit_document.png" alt="Counterfeit document" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_FAKE" />
+        <ResponseField name="reason" type="REASON_AUTHENTICATION_FAILED" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+      <Accordion title="Duplicate scan">
+        <Frame caption="T90000006">
+          <img src="/images/testing/drivers_license-duplicate_scan.png" alt="Duplicate scan" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="reason" type="REASON_MULTI_SCAN" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+      <Accordion title="Flagged patron">
+        <Frame caption="T90000007">
+          <img src="/images/testing/drivers_license-flagged_patron.png" alt="Flagged patron" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="reason" type="REASON_PATRON_STATUS" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+      <Accordion title="DMV confirmed">
+        <Frame caption="T90000008">
+          <img src="/images/testing/drivers_license-dmv_confirmed.png" alt="DMV confirmed" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_VERIFIED_REAL" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+        <ResponseField name="dldv" type="completed" />
+      </Accordion>
+      <Accordion title="DMV rejected">
+        <Frame caption="T90000009">
+          <img src="/images/testing/drivers_license-dmv_rejected.png" alt="DMV rejected" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_VERIFIED_FAKE" />
+        <ResponseField name="reason" type="REASON_DMV_VERIFICATION_FAILED" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+        <ResponseField name="dldv" type="completed" />
+      </Accordion>
+    </AccordionGroup>
+  </Tab>
+  <Tab title="Passport book">
+    <AccordionGroup>
+      <Accordion title="Accepted">
+        <Frame caption="T90000010">
+          <img src="/images/testing/passport_book-accepted.png" alt="Accepted" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+      <Accordion title="Expired document">
+        <Frame caption="T90000011">
+          <img src="/images/testing/passport_book-expired_document.png" alt="Expired document" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="reason" type="REASON_EXPIRED" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="false" />
+      </Accordion>
+      <Accordion title="Underage holder">
+        <Frame caption="T90000012">
+          <img src="/images/testing/passport_book-underage_holder.png" alt="Underage holder" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="reason" type="REASON_NOT_OF_AGE" />
+        <ResponseField name="verification.of_age" type="false" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+      <Accordion title="Damaged MRZ">
+        <Frame caption="T90000013">
+          <img src="/images/testing/passport_book-damaged_mrz.png" alt="Damaged MRZ" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_REJECT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_FAKE" />
+        <ResponseField name="reason" type="REASON_BARCODE_VALIDATION_FAILED" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+    </AccordionGroup>
+  </Tab>
+  <Tab title="Passport card">
+    <AccordionGroup>
+      <Accordion title="Accepted">
+        <Frame caption="T90000014">
+          <img src="/images/testing/passport_card-accepted.png" alt="Accepted" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+    </AccordionGroup>
+  </Tab>
+  <Tab title="Enhanced driver's license">
+    <AccordionGroup>
+      <Accordion title="Accepted">
+        <Frame caption="T90000015">
+          <img src="/images/testing/enhanced_drivers_license-accepted.png" alt="Accepted" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+    </AccordionGroup>
+  </Tab>
+  <Tab title="Other travel document">
+    <AccordionGroup>
+      <Accordion title="Accepted">
+        <Frame caption="T90000016">
+          <img src="/images/testing/other_travel_document-accepted.png" alt="Accepted" />
+        </Frame>
+        <ResponseField name="verification.decision" type="DECISION_ACCEPT" />
+        <ResponseField name="verification.integrity" type="INTEGRITY_REAL" />
+        <ResponseField name="verification.of_age" type="true" />
+        <ResponseField name="verification.not_expired" type="true" />
+      </Accordion>
+    </AccordionGroup>
+  </Tab>
+</Tabs>

@@ -3,7 +3,7 @@ title: "Errors"
 description: "Error reporting and capture recovery."
 ---
 
-`createCapture()` rejects if initialization fails. After initialization, capture failures appear in `onState` with `Phase.FAILED` and `state.error`.
+`createSession()` rejects if initialization fails. After initialization, capture failures appear in `onState` with `Phase.FAILED` and `state.error`.
 
 The [ErrorCode reference](/external/reference#errorcode) lists every code.
 
@@ -15,12 +15,12 @@ Before the first capture is accepted, update the country or document type:
 capture.update({ country: correctedCountry, documentType: correctedDocumentType });
 ```
 
-After a capture has been accepted, changing documents requires a new scan. `state.resumable` indicates accepted captures.
+After a capture has been accepted, changing documents requires a new scan; the server rejects further selection changes.
 
 ## Resume after failure
 
-`start()` resumes a failed or stopped instance. Expired or rejected credentials require a fresh [capture token](/external/api/create-token) and a new SDK instance for the same scan. See [Resume a scan](/external/resume).
+`start()` resumes a failed or stopped instance. Expired or rejected credentials require a fresh [session token](/external/api/create-token) and a new SDK instance for the same scan. See [Resume a scan](/external/resume).
 
 ## Browser requirements
 
-Capture requires HTTPS or localhost. Content Security Policy must allow `https://cdn.bouncr.io` for scripts and connections, `blob:` workers, and WebAssembly compilation.
+Capture requires HTTPS or localhost. Content Security Policy must allow `connect-src` to `https://cdn.bouncrlabs.com` (models and WebAssembly are versioned there and digest-verified on load), `connect-src` to the API origin over `wss:`, same-origin workers (`worker-src 'self'`), and WebAssembly compilation (`'wasm-unsafe-eval'`).

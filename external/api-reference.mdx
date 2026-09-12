@@ -8,15 +8,14 @@ Base URL: `https://api.bouncr.io`.
 | Scope | Access |
 | --- | --- |
 | `scans:create` | Create scans in authorized venues. |
-| `scans:capture` | Include capture initialization when creating a scan, or issue a new capture token. |
-| `scans:read` | Retrieve a scan and its available results. |
-| `scans:list` | List scans in authorized venues. |
+| `scans:update` | Include session initialization when creating a scan, or issue a new session token. |
+| `scans:read` | List scans in authorized venues and retrieve a scan with its available results. |
 | `packages:read` | Download `@bouncrlabs/idv` from `registry.bouncrlabs.com`. |
 
 | Credential | Use | Sensitive |
 | --- | --- | --- |
 | Organization API credential | Server-side API access within its scopes. | Yes; server-only. |
-| Capture token | SDK access to one scan. | Scan-scoped; supplied to the client. |
+| Session token | SDK access to one scan. | Scan-scoped; supplied to the client. |
 | Package download credential | Organization credential scoped to `packages:read`. | Yes; build environment only. |
 
 Scan and venue IDs are strings. Error responses may have no body.

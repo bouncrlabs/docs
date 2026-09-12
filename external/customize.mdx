@@ -7,7 +7,7 @@ description: "Select a document, start capture, and control the camera."
 
 Initialization loads the scan’s current selection and available choices without opening the camera.
 
-Use `state.countryCodes` for the country picker. Selecting a country loads its permitted document types:
+Build the country picker from any ISO 3166 alpha-2 list; the server rejects countries the venue does not accept. Selecting a country loads its permitted document types:
 
 ```typescript
 capture.update({ country: selectedCountry });
@@ -29,7 +29,7 @@ After selection, the SDK enters `Phase.READY`. Call `start()` to open the camera
 capture.start();
 ```
 
-`state.side` identifies the requested side and `state.guidance` reports capture feedback. The SDK captures automatically and advances through the required sides.
+`state.phase` identifies the requested side (`CAPTURING_FRONT` or `CAPTURING_REAR`), `state.reading` what the SDK is decoding, and `state.guidance` reports capture feedback. The SDK captures automatically and advances through the required sides.
 
 ## Manual capture
 
@@ -37,7 +37,7 @@ capture.start();
 capture.capture();
 ```
 
-Available during `Phase.CAPTURING`.
+Available during `Phase.CAPTURING_FRONT` and `Phase.CAPTURING_REAR`.
 
 ## Flashlight
 

@@ -16,46 +16,46 @@ Set `BOUNCR_NPM_TOKEN` to your organization’s credential with the `packages:re
 npm install @bouncrlabs/idv
 ```
 
-The SDK loads its versioned runtime from `cdn.bouncr.io`. The package download credential is for installation only; do not pass it to `createCapture`.
+The SDK loads its versioned runtime from `cdn.bouncr.io`. The package download credential is for installation only; do not pass it to `createSession`.
 
 ## Initialize
 
-[Create a scan](/external/backend) on your backend. Pass the returned `capture.token` and `capture.configuration` to the component.
+[Create a scan](/external/backend) on your backend. Pass the returned `session.token` and `session.configuration` to the component.
 
 This example uses a scan created with `country` and `document_type` already selected. For selection during capture, connect the [document controls](/external/customize#select-a-document) to the same instance.
 
 ```tsx Capture.tsx
 import { useEffect, useRef, useState } from 'react';
-import type { CaptureOptions, CaptureState } from '@bouncrlabs/idv';
+import type { SessionOptions, SessionState } from '@bouncrlabs/idv';
 
 type SDK = typeof import('@bouncrlabs/idv');
-type CaptureInstance = Awaited<ReturnType<SDK['createCapture']>>;
-type Props = Pick<CaptureOptions, 'token' | 'configuration'>;
+type SessionInstance = Awaited<ReturnType<SDK['createSession']>>;
+type Props = Pick<SessionOptions, 'token' | 'configuration'>;
 
 export function Capture({ token, configuration }: Props) {
   const video = useRef<HTMLVideoElement>(null);
-  const capture = useRef<CaptureInstance | undefined>(undefined);
+  const session = useRef<SessionInstance | undefined>(undefined);
   const [sdk, setSdk] = useState<SDK>();
-  const [state, setState] = useState<CaptureState>();
+  const [state, setState] = useState<SessionState>();
   const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     setState(undefined);
     setLoadError(false);
     let disposed = false;
-    let instance: CaptureInstance | undefined;
+    let instance: SessionInstance | undefined;
 
     async function initialize() {
       const module = await import('@bouncrlabs/idv');
       if (disposed || !video.current) return;
-      instance = await module.createCapture({
+      instance = await module.createSession({
         video: video.current,
         token,
         configuration,
         onState: next => { if (!disposed) setState(next); },
       });
       if (disposed) return instance.destroy();
-      capture.current = instance;
+      session.current = instance;
       setSdk(module);
     }
 
@@ -63,12 +63,12 @@ export function Capture({ token, configuration }: Props) {
     return () => {
       disposed = true;
       instance?.destroy();
-      capture.current = undefined;
+      session.current = undefined;
     };
   }, [token, configuration]);
 
   const ready = sdk && (state?.phase === sdk.Phase.READY || state?.phase === sdk.Phase.STOPPED);
-  const active = sdk && state?.phase === sdk.Phase.CAPTURING;
+  const active = sdk && (state?.phase === sdk.Phase.CAPTURING_FRONT || state?.phase === sdk.Phase.CAPTURING_REAR);
   const complete = sdk && state?.phase === sdk.Phase.COMPLETE;
   const failed = loadError || (sdk && state?.phase === sdk.Phase.FAILED);
 
@@ -77,10 +77,10 @@ export function Capture({ token, configuration }: Props) {
       {failed && <p role="alert">Capture could not continue.</p>}
       {complete && <p>Capture complete.</p>}
       <video ref={video} autoPlay playsInline muted hidden={!active} />
-      <button disabled={!ready} onClick={() => capture.current?.start()}>
+      <button disabled={!ready} onClick={() => session.current?.start()}>
         Start capture
       </button>
-      {active && <button onClick={() => capture.current?.stop()}>Stop</button>}
+      {active && <button onClick={() => session.current?.stop()}>Stop</button>}
     </section>
   );
 }

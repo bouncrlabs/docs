@@ -3,24 +3,21 @@ title: "Web SDK reference"
 description: "Options, methods, state, and callbacks."
 ---
 
-## createCapture(options)
+## createSession(options)
 
-Initializes the SDK and loads the scan’s state. Returns a promise for the capture instance. Camera access begins with `start()`.
+Opens the session stream and loads the scan’s state. Returns a promise for the session instance. Camera access begins with `start()`.
 
 <ParamField body="video" type="HTMLVideoElement" required>
 Mounted preview element.
 </ParamField>
 <ParamField body="token" type="string" required>
-Capture token returned by the API.
+Session token returned by the API.
 </ParamField>
 <ParamField body="configuration" type="string" required>
-Configuration returned with the capture token. Pass unchanged.
+Configuration returned with the session token. Pass unchanged.
 </ParamField>
-<ParamField body="onState" type="(state: CaptureState) => void" required>
+<ParamField body="onState" type="(state: SessionState) => void" required>
 Receives lifecycle, selection, guidance, and error updates.
-</ParamField>
-<ParamField body="maxAnalysisFps" type="number" default="30">
-Analysis ceiling, from 1 to 30. Actual analysis rate adapts to device performance.
 </ParamField>
 
 ### Callbacks
@@ -38,29 +35,23 @@ Analysis ceiling, from 1 to 30. Actual analysis rate adapts to device performanc
 | --- | --- | --- |
 | `update({ country?, documentType? })` | `void` | Changes the selection before any capture is accepted. Country uses an ISO alpha-2 code; document type uses `DocumentType`. |
 | `start()` | `void` | Starts the camera from `READY`, or resumes a stopped capture. |
-| `capture()` | `void` | Requests manual capture during `CAPTURING`. |
+| `capture()` | `void` | Requests manual capture during `CAPTURING_FRONT` or `CAPTURING_REAR`. |
 | `stop()` | `void` | Stops capture and releases the camera. |
 | `destroy()` | `void` | Releases the instance and its resources. |
 | `setTorch(enabled: boolean)` | `Promise<void>` | Sets the flashlight; rejects when unavailable. |
-| `setAnalysisFps(value: number)` | `void` | Updates the analysis ceiling; values outside 1–30 throw. |
 
-## CaptureState
+## SessionState
 
 | Field | Type | Description |
 | --- | --- | --- |
 | `phase` | `Phase` | Capture lifecycle state. |
 | `guidance` | `Guidance` | Capture feedback. |
-| `scanId` | `string?` | Scan identifier. |
-| `resumable` | `boolean` | Accepted captures are available to restore. |
-| `countryCodes` | `string[]` | Available issuing countries. |
 | `country` | `string` | Selected ISO alpha-2 country; empty before selection. |
 | `allowedDocumentTypes` | `DocumentType[]` | Available types for the selected country. |
 | `documentType` | `DocumentType` | Selected type. |
-| `side` | `Side` | Requested capture side. |
-| `givenName` | `string` | Given name after capture; empty when unavailable. |
-| `error` | `{ code: ErrorCode; status: number }?` | Capture failure. |
+| `reading` | `Reading` | What still needs decoding on the current side: `BARCODE_2D`, `MRZ`, or `UNSPECIFIED` once a reading was accepted. |
+| `error` | `{ code: ErrorCode }?` | Capture failure. |
 
-Selection arrays are empty once capture has been accepted.
 
 ### Phase
 
@@ -72,8 +63,8 @@ Selection arrays are empty once capture has been accepted.
 | `SELECTING_DOCUMENT` | Awaiting document selection. |
 | `UPDATING` | Saving selection. |
 | `READY` | Ready for `start()`. |
-| `CAPTURING` | Camera capture active. |
-| `SUBMITTING` | Submitting captured evidence. |
+| `CAPTURING_FRONT` | Camera capture active for the front. |
+| `CAPTURING_REAR` | Camera capture active for the rear. |
 | `PROCESSING` | Server processing in progress. |
 | `COMPLETE` | Processing finished. |
 | `FAILED` | Failed; see `error.code`. |
@@ -129,32 +120,22 @@ Available selections are returned in `allowedDocumentTypes`.
 | --- | --- |
 | `UNSPECIFIED` | No error code assigned. |
 | `ABORTED` | Operation canceled. |
-| `ACCESS_DENIED` | Operation is not permitted. |
 | `CALLBACK_FAILED` | An application callback failed. |
 | `CAMERA_PERMISSION_DENIED` | Camera permission was denied. |
 | `CAMERA_UNAVAILABLE` | The camera or a camera frame is unavailable. |
 | `CAPTURE_FAILED` | Capture could not complete. |
 | `COUNTRY_MISMATCH` | Document issuer differs from the selected country. |
 | `DOCUMENT_TYPE_MISMATCH` | Document differs from the selected type. |
-| `HTTPS_REQUIRED` | The capture environment is not a secure context. |
 | `IMAGE_ENCODING_FAILED` | The captured image could not be encoded. |
 | `INVALID_AUTHORIZATION` | Initialization credentials or configuration are invalid. |
-| `INVALID_AUTHORIZATION_RESPONSE` | Authorization returned an invalid response. |
-| `INVALID_CAPTURE_EVIDENCE` | Capture evidence is invalid. |
 | `INVALID_CAPTURE_SNAPSHOT` | Capture state is invalid or inconsistent. |
-| `INVALID_ENDPOINT` | The API endpoint is invalid. |
 | `INVALID_EVIDENCE` | The server rejected the submitted evidence. |
 | `INVALID_JOB_STATUS` | A processing status update is invalid. |
 | `INVALID_REQUEST` | Request or operation arguments are invalid. |
 | `INVALID_RESPONSE` | A response is invalid. |
-| `INVALID_STATUS_STREAM` | The status stream is invalid. |
 | `KEY_GENERATION_FAILED` | Capture key generation failed. |
 | `NETWORK_ERROR` | A network request failed. |
-| `NOT_FOUND` | The requested resource is missing or inaccessible. |
-| `REQUEST_FAILED` | The server rejected the request. |
-| `RESPONSE_TOO_LARGE` | A response exceeded the size limit. |
 | `SIGNING_FAILED` | Capture signing failed. |
-| `STATUS_STREAM_TOO_LARGE` | The status stream exceeded the size limit. |
 | `SUPERSEDED` | See `Phase.SUPERSEDED`. |
 | `UNAUTHORIZED` | Credentials were rejected. |
 

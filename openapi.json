@@ -27,7 +27,7 @@
       "post": {
         "operationId": "create_scan",
         "summary": "Create a scan",
-        "description": "Create a scan using the venue\u2019s document policy. Include scans:capture to receive SDK initialization data in the same response.\n\nRequired scope: `scans:create`.",
+        "description": "Create a scan using the venue’s document policy. Include scans:update to receive session initialization data in the same response.\n\nRequired scope: `scans:create`.",
         "tags": [
           "Scans"
         ],
@@ -91,7 +91,7 @@
       "get": {
         "operationId": "list_scans",
         "summary": "List scans",
-        "description": "List accessible scans from newest to oldest. Follow `pagination.after` for the next page or `pagination.before` for the previous page. A null cursor marks the end.\n\nRequired scope: `scans:list`.",
+        "description": "List accessible scans from newest to oldest. Follow `pagination.after` for the next page or `pagination.before` for the previous page. A null cursor marks the end.\n\nRequired scope: `scans:read`.",
         "tags": [
           "Scans"
         ],
@@ -240,8 +240,8 @@
     "/v1/scans/{scan_id}/tokens": {
       "post": {
         "operationId": "create_capture_token",
-        "summary": "Create a capture token",
-        "description": "Initialize or resume capture for an existing scan. Pass token and configuration to createCapture.\n\nRequired scope: `scans:capture`.",
+        "summary": "Create a session token",
+        "description": "Initialize or resume capture for an existing scan. Pass token and configuration to createSession.\n\nRequired scope: `scans:update`.",
         "tags": [
           "Scans"
         ],
@@ -271,7 +271,7 @@
         },
         "x-mint": {
           "metadata": {
-            "title": "Create a capture token"
+            "title": "Create a session token"
           }
         },
         "parameters": [
@@ -309,9 +309,9 @@
           "id": {
             "$ref": "#/components/schemas/ScanId"
           },
-          "capture": {
+          "session": {
             "$ref": "#/components/schemas/CaptureInitialization",
-            "description": "Included when the credential has scans:capture."
+            "description": "Included when the credential has scans:update."
           }
         },
         "required": [
@@ -349,7 +349,7 @@
               "DECISION_REJECT",
               "DECISION_VERIFY"
             ],
-            "description": "Verification decision under the venue\u2019s policy."
+            "description": "Verification decision under the venue’s policy."
           },
           "integrity": {
             "type": "string",
@@ -538,7 +538,7 @@
         "properties": {
           "token": {
             "type": "string",
-            "description": "Pass to createCapture as token."
+            "description": "Pass to createSession as token."
           },
           "expires_at": {
             "type": "string",
@@ -546,7 +546,7 @@
           },
           "configuration": {
             "type": "string",
-            "description": "Pass unchanged to createCapture as configuration."
+            "description": "Pass unchanged to createSession as configuration."
           }
         }
       },
@@ -568,7 +568,8 @@
             "enum": [
               "PHASE_SELECTING_COUNTRY",
               "PHASE_SELECTING_DOCUMENT",
-              "PHASE_CAPTURING",
+              "PHASE_CAPTURING_FRONT",
+              "PHASE_CAPTURING_REAR",
               "PHASE_PROCESSING",
               "PHASE_COMPLETE"
             ]
@@ -619,53 +620,8 @@
       },
       "Identity": {
         "type": "object",
-        "description": "Identity details available from the scan\u2019s enabled checks.",
+        "description": "Identity details available from the scan’s enabled checks.",
         "properties": {
-          "aliases": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "kind": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "full_name": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "given_name": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "middle_name": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "surname": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "required": [
-                "kind",
-                "full_name",
-                "given_name",
-                "middle_name",
-                "surname"
-              ]
-            }
-          },
           "addresses": {
             "type": "array",
             "items": {
@@ -746,45 +702,6 @@
               "required": [
                 "kind",
                 "value"
-              ]
-            }
-          },
-          "demographics": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "kind": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "value_date": {
-                  "type": [
-                    "string",
-                    "null"
-                  ],
-                  "format": "date"
-                },
-                "value_int": {
-                  "type": [
-                    "integer",
-                    "null"
-                  ]
-                },
-                "value_text": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "required": [
-                "kind",
-                "value_date",
-                "value_int",
-                "value_text"
               ]
             }
           },
@@ -1012,10 +929,8 @@
           }
         },
         "required": [
-          "aliases",
           "addresses",
           "contacts",
-          "demographics",
           "educations",
           "employments"
         ]

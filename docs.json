@@ -27,7 +27,8 @@
           "external/customize",
           "external/resume",
           "external/recovery",
-          "external/results"
+          "external/results",
+          "external/testing"
         ]
       },
       {
