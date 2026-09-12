@@ -16,7 +16,7 @@ Set `BOUNCR_NPM_TOKEN` to your organization’s credential with the `packages:re
 npm install @bouncrlabs/idv
 ```
 
-The SDK loads its versioned runtime from `cdn.bouncr.io`. The package download credential is for installation only; do not pass it to `createCapture`.
+The SDK loads its versioned runtime from `cdn.bouncr.io`. The package download credential is for installation only; do not pass it to `createSession`.
 
 ## Initialize
 
@@ -26,17 +26,17 @@ This example uses a scan created with `country` and `document_type` already sele
 
 ```tsx Capture.tsx
 import { useEffect, useRef, useState } from 'react';
-import type { CaptureOptions, CaptureState } from '@bouncrlabs/idv';
+import type { SessionOptions, SessionState } from '@bouncrlabs/idv';
 
 type SDK = typeof import('@bouncrlabs/idv');
-type CaptureInstance = Awaited<ReturnType<SDK['createCapture']>>;
-type Props = Pick<CaptureOptions, 'token' | 'configuration'>;
+type CaptureInstance = Awaited<ReturnType<SDK['createSession']>>;
+type Props = Pick<SessionOptions, 'token' | 'configuration'>;
 
 export function Capture({ token, configuration }: Props) {
   const video = useRef<HTMLVideoElement>(null);
   const capture = useRef<CaptureInstance | undefined>(undefined);
   const [sdk, setSdk] = useState<SDK>();
-  const [state, setState] = useState<CaptureState>();
+  const [state, setState] = useState<SessionState>();
   const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export function Capture({ token, configuration }: Props) {
     async function initialize() {
       const module = await import('@bouncrlabs/idv');
       if (disposed || !video.current) return;
-      instance = await module.createCapture({
+      instance = await module.createSession({
         video: video.current,
         token,
         configuration,

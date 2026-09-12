@@ -3,7 +3,7 @@ title: "Web SDK reference"
 description: "Options, methods, state, and callbacks."
 ---
 
-## createCapture(options)
+## createSession(options)
 
 Initializes the SDK and loads the scan’s state. Returns a promise for the capture instance. Camera access begins with `start()`.
 
@@ -16,7 +16,7 @@ Capture token returned by the API.
 <ParamField body="configuration" type="string" required>
 Configuration returned with the capture token. Pass unchanged.
 </ParamField>
-<ParamField body="onState" type="(state: CaptureState) => void" required>
+<ParamField body="onState" type="(state: SessionState) => void" required>
 Receives lifecycle, selection, guidance, and error updates.
 </ParamField>
 
@@ -40,7 +40,7 @@ Receives lifecycle, selection, guidance, and error updates.
 | `destroy()` | `void` | Releases the instance and its resources. |
 | `setTorch(enabled: boolean)` | `Promise<void>` | Sets the flashlight; rejects when unavailable. |
 
-## CaptureState
+## SessionState
 
 | Field | Type | Description |
 | --- | --- | --- |

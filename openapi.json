@@ -241,7 +241,7 @@
       "post": {
         "operationId": "create_capture_token",
         "summary": "Create a capture token",
-        "description": "Initialize or resume capture for an existing scan. Pass token and configuration to createCapture.\n\nRequired scope: `scans:update`.",
+        "description": "Initialize or resume capture for an existing scan. Pass token and configuration to createSession.\n\nRequired scope: `scans:update`.",
         "tags": [
           "Scans"
         ],
@@ -538,7 +538,7 @@
         "properties": {
           "token": {
             "type": "string",
-            "description": "Pass to createCapture as token."
+            "description": "Pass to createSession as token."
           },
           "expires_at": {
             "type": "string",
@@ -546,7 +546,7 @@
           },
           "configuration": {
             "type": "string",
-            "description": "Pass unchanged to createCapture as configuration."
+            "description": "Pass unchanged to createSession as configuration."
           }
         }
       },
