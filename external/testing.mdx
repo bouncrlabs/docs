@@ -7,7 +7,7 @@ A **test credential** is an API application created in test mode. It runs the sa
 
 Under a test credential, scanning one of the synthetic documents below returns that document's canned outcome. Scanning any other document parses normally but still skips vendors and billing. Under a live credential, every test document is rejected as `INTEGRITY_FAKE` with `REASON_AUTHENTICATION_FAILED`, so a printed test barcode never passes at a venue.
 
-Every test document belongs to a person whose surname is `TEST` and whose given names spell the scenario, so operators can tell at a glance what they scanned. Print the barcodes at 100% or show them on a second screen; MRZ lines must be printed in the OCR-B typeface to be read by the camera.
+Every test document belongs to a person whose surname is `TEST` and whose given names spell the scenario, so operators can tell at a glance what they scanned. Print the barcodes at 100% or show them on a second screen; MRZ images are set in OCR-B, the typeface the camera reads; the text below each one is there to copy.
 
 ## Driver's licenses (PDF417)
 
@@ -135,12 +135,16 @@ Every test document belongs to a person whose surname is `TEST` and whose given 
 
 ### PASSPORT ACCEPT TEST
 
+<img src="/images/testing/passport_accept.png" alt="MRZ for PASSPORT ACCEPT TEST" width="600" />
+
 ```text
 P<USATEST<<PASSPORT<ACCEPT<<<<<<<<<<<<<<<<<<
 T900000239USA9006061M3012109<<<<<<<<<<<<<<06
 ```
 
 ### PASSPORT EXPIRED TEST
+
+<img src="/images/testing/passport_expired.png" alt="MRZ for PASSPORT EXPIRED TEST" width="600" />
 
 ```text
 P<USATEST<<PASSPORT<EXPIRED<<<<<<<<<<<<<<<<<
@@ -149,12 +153,16 @@ T900000240USA9006061M2001012<<<<<<<<<<<<<<08
 
 ### PASSPORT UNDERAGE TEST
 
+<img src="/images/testing/passport_underage.png" alt="MRZ for PASSPORT UNDERAGE TEST" width="600" />
+
 ```text
 P<USATEST<<PASSPORT<UNDERAGE<<<<<<<<<<<<<<<<
 T900000251USA1506060M3012109<<<<<<<<<<<<<<00
 ```
 
 ### PASSPORT CHECKSUM FAILED TEST
+
+<img src="/images/testing/passport_checksum_failed.png" alt="MRZ for PASSPORT CHECKSUM FAILED TEST" width="600" />
 
 ```text
 P<USATEST<<PASSPORT<CHECKSUM<FAILED<<<<<<<<<
@@ -168,6 +176,8 @@ T900000262USA9006061M3012109<<<<<<<<<<<<<<01
 | PASSPORT CARD ACCEPT TEST | `T90000027` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | — | Accepted passport card. |
 
 ### PASSPORT CARD ACCEPT TEST
+
+<img src="/images/testing/passport_card_accept.png" alt="MRZ for PASSPORT CARD ACCEPT TEST" width="600" />
 
 ```text
 IPUSAT900000273<<<<<<<<<<<<<<<
@@ -183,6 +193,8 @@ TEST<<PASSPORT<CARD<ACCEPT<<<<
 
 ### EDL ACCEPT TEST
 
+<img src="/images/testing/edl_accept.png" alt="MRZ for EDL ACCEPT TEST" width="600" />
+
 ```text
 IDUSAT900000284<<<<<<<<<<<<<<<
 9006061M3012109USAVA<<<<<<<<<3
@@ -196,6 +208,8 @@ TEST<<EDL<ACCEPT<<<<<<<<<<<<<<
 | TRAVEL DOCUMENT ACCEPT TEST | `T90000029` | `DECISION_ACCEPT` | `REASON_UNSPECIFIED` | `INTEGRITY_REAL` | true | true | — | Accepted non-US travel document. |
 
 ### TRAVEL DOCUMENT ACCEPT TEST
+
+<img src="/images/testing/travel_document_accept.png" alt="MRZ for TRAVEL DOCUMENT ACCEPT TEST" width="600" />
 
 ```text
 IDCANT900000295<<<<<<<<<<<<<<<
