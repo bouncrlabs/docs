@@ -23,4 +23,4 @@ After a capture has been accepted, changing documents requires a new scan; the s
 
 ## Browser requirements
 
-Capture requires HTTPS or localhost. Content Security Policy must allow `script-src` and `connect-src` to `https://cdn.bouncr.io` (the runtime loader, models and WebAssembly are versioned there), `connect-src` to the API origin over `wss:`, same-origin workers (`worker-src 'self'`), and WebAssembly compilation (`'wasm-unsafe-eval'`).
+Capture requires HTTPS or localhost. Content Security Policy must allow `connect-src` to `https://cdn.bouncr.io` (models and WebAssembly are versioned there and digest-verified on load), `connect-src` to the API origin over `wss:`, same-origin workers (`worker-src 'self'`), and WebAssembly compilation (`'wasm-unsafe-eval'`).
